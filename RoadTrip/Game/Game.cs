@@ -1,6 +1,12 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using Leopotam.Ecs;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
 using RoadTrip.Game.Components;
 
 namespace RoadTrip.Game
@@ -36,6 +42,8 @@ namespace RoadTrip.Game
             cursorPosition.Coordinate = new Coordinate(0,0,0);
 
             Map = ExtremeHacks();
+
+            Scripts();
         }
 
         public void Tick()
@@ -252,5 +260,39 @@ FFFFF.....................└──────────┐FFFF..............
 
             return map;
         }
+
+
+        public List<Terrain> Terrains { get; set; } = new List<Terrain>();
+
+        private void Scripts()
+        {
+            var scriptGlobals = new ScriptGlobals { GlobalGame = this};
+
+            var code = File.ReadAllText(Path.Join(AppContext.BaseDirectory, "Data","Test.csx"));
+            var opts = ScriptOptions.Default;
+
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in assemblies) {
+                opts.AddReferences(assembly);
+            }
+
+            var script = CSharpScript.Create(code, opts, typeof(ScriptGlobals));
+            var compilation = script.GetCompilation();
+            var diagnostics = compilation.GetDiagnostics();
+            if (diagnostics.Any())
+            {
+                foreach (var diagnostic in diagnostics) {
+                    var derp = diagnostic.GetMessage();
+                }
+            }
+            else {
+                var result = script.RunAsync(globals: scriptGlobals).Result;
+            }
+        }
+    }
+
+    public class ScriptGlobals
+    {
+        public Game GlobalGame;
     }
 }
