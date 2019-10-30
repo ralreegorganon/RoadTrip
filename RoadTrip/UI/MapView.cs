@@ -66,7 +66,7 @@ namespace RoadTrip.UI
                 var screenPos = WorldToScreen(pos.Coordinate, worldFrameAbs, cameraFocusPosition.Coordinate);
                 if (screenPos != null) {
                     Terminal.Color(render.Color);
-                    Put(screenPos.Value.X, screenPos.Value.Y, '@');
+                    Put(screenPos.Value.X, screenPos.Value.Y, render.Symbol);
                 }
             }
         }
