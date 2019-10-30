@@ -271,7 +271,7 @@ FFFFF.....................└──────────┐FFFF..............
             var code = File.ReadAllText(Path.Join(AppContext.BaseDirectory, "Data","Test.csx"));
             var opts = ScriptOptions.Default;
 
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.IsDynamic == false);
             foreach (var assembly in assemblies) {
                 opts.AddReferences(assembly);
             }
