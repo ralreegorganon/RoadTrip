@@ -1,6 +1,6 @@
-﻿using DryIoc;
+﻿using System;
+using DryIoc;
 using Leopotam.Ecs;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
 using RoadTrip.Game.Systems;
 using RoadTrip.UI;
 
@@ -13,6 +13,10 @@ namespace RoadTrip
         public God()
         {
             Container = new Container();
+
+            Container.Register(Made.Of(() => Serilog.Log.Logger), setup: Setup.With(condition: r => r.Parent.ImplementationType == null));
+            Container.Register(Made.Of(() => Serilog.Log.ForContext(Arg.Index<Type>(0)), r => r.Parent.ImplementationType), setup: Setup.With(condition: r => r.Parent.ImplementationType != null));
+
             Container.Register<Game.Game>(Reuse.Singleton);
             Container.Register<RootView>(Reuse.Singleton);
             Container.Register<MapView>(Reuse.Singleton);

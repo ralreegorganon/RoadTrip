@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using Leopotam.Ecs;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using RoadTrip.Game.Components;
+using Serilog;
 
 namespace RoadTrip.Game
 {
@@ -25,10 +25,13 @@ namespace RoadTrip.Game
 
         private EcsSystems Systems { get; }
 
-        public Game(EcsWorld world, EcsSystems systems)
+        private ILogger Logger { get; set; }
+
+        public Game(EcsWorld world, EcsSystems systems, ILogger logger)
         {
             World = world;
             Systems = systems;
+            Logger = logger;
         }
 
         public void Setup()
