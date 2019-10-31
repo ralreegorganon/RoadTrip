@@ -14,6 +14,7 @@ namespace RoadTripBenchmark
         public virtual void GlobalSetup()
         {
             var god = new God();
+            god.Container.Resolve<Codex>();
             Game = god.Container.Resolve<Game>();
             Game.Setup();
         }

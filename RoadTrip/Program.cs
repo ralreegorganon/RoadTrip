@@ -23,6 +23,7 @@ namespace RoadTrip
                 Log.Information("Starting up");
 
                 var god = new God();
+                var codex = god.Container.Resolve<Codex>();
                 var game = god.Container.Resolve<Game.Game>();
                 var rootView = god.Container.Resolve<RootView>();
 
@@ -79,10 +80,6 @@ namespace RoadTrip
                                 {
                                     game.Player.Unset<CameraFocusTag>();
                                     game.Cursor.Set<CameraFocusTag>();
-
-                                    var playerPos = game.Player.Get<Position>();
-                                    var cursorPos = game.Cursor.Get<Position>();
-                                    cursorPos.Coordinate = playerPos.Coordinate;
                                 }
                                 else
                                 {

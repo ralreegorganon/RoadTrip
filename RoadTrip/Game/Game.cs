@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.IO;
-using System.Linq;
 using Leopotam.Ecs;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Scripting;
 using RoadTrip.Game.Components;
 using Serilog;
 
@@ -17,15 +12,15 @@ namespace RoadTrip.Game
 
         public Map Map { get; set; } = new Map();
 
-        public EcsEntity Player { get; private set; }
+        public EcsEntity Player { get; set; }
 
-        public EcsEntity Cursor { get; private set; }
+        public EcsEntity Cursor { get; set; }
 
         private EcsWorld World { get; }
 
         private EcsSystems Systems { get; }
 
-        private ILogger Logger { get; set; }
+        private ILogger Logger { get; }
 
         public Game(EcsWorld world, EcsSystems systems, ILogger logger)
         {
@@ -36,17 +31,9 @@ namespace RoadTrip.Game
 
         public void Setup()
         {
-            Player = World.NewEntityWith<Position, Renderable, PlayerControllable, CameraFocusTag>(out var playerPosition, out var playerRenderable, out _, out _);
-            playerPosition.Coordinate = new Coordinate(0, 0, 0);
-            playerRenderable.Color = Color.Red;
-            playerRenderable.Symbol = '@';
-
-            Cursor = World.NewEntityWith<Position, CursorTag>(out var cursorPosition, out _);
-            cursorPosition.Coordinate = new Coordinate(0,0,0);
+            
 
             Map = ExtremeHacks();
-
-            Scripts();
         }
 
         public void Tick()
@@ -263,39 +250,5 @@ FFFFF.....................└──────────┐FFFF..............
 
             return map;
         }
-
-
-        public List<Terrain> Terrains { get; set; } = new List<Terrain>();
-
-        private void Scripts()
-        {
-            var scriptGlobals = new ScriptGlobals { GlobalGame = this};
-
-            var code = File.ReadAllText(Path.Join(AppContext.BaseDirectory, "Data","Test.csx"));
-            var opts = ScriptOptions.Default;
-
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.IsDynamic == false);
-            foreach (var assembly in assemblies) {
-                opts.AddReferences(assembly);
-            }
-
-            var script = CSharpScript.Create(code, opts, typeof(ScriptGlobals));
-            var compilation = script.GetCompilation();
-            var diagnostics = compilation.GetDiagnostics();
-            if (diagnostics.Any())
-            {
-                foreach (var diagnostic in diagnostics) {
-                    var derp = diagnostic.GetMessage();
-                }
-            }
-            else {
-                var result = script.RunAsync(globals: scriptGlobals).Result;
-            }
-        }
-    }
-
-    public class ScriptGlobals
-    {
-        public Game GlobalGame;
     }
 }
