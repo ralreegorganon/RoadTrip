@@ -38,7 +38,7 @@
     <None Update="Data\Player.csx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Data\Test.csx">
+    <None Update="Data\TerrainTypes.csx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="libBearLibTerminal.dylib">

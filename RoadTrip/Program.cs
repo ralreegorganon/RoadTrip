@@ -23,7 +23,9 @@ namespace RoadTrip
                 Log.Information("Starting up");
 
                 var god = new God();
-                var codex = god.Container.Resolve<Codex>();
+                
+                god.Container.Resolve<ScriptLoader>();
+                
                 var game = god.Container.Resolve<Game.Game>();
                 var rootView = god.Container.Resolve<RootView>();
 

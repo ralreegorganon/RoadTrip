@@ -2,8 +2,9 @@
 
 namespace RoadTrip.Game
 {
-    public class Terrain
+    public class TerrainType
     {
+        public string Name { get; set; }
         public Renderable Renderable { get; set; }
     }
 }

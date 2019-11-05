@@ -2,6 +2,7 @@
 using DryIoc;
 using Leopotam.Ecs;
 using RoadTrip.Game;
+using RoadTrip.Game.Mapgen;
 using RoadTrip.Game.Systems;
 using RoadTrip.UI;
 
@@ -18,8 +19,10 @@ namespace RoadTrip
             Container.Register(Made.Of(() => Serilog.Log.Logger), setup: Setup.With(condition: r => r.Parent.ImplementationType == null));
             Container.Register(Made.Of(() => Serilog.Log.ForContext(Arg.Index<Type>(0)), r => r.Parent.ImplementationType), setup: Setup.With(condition: r => r.Parent.ImplementationType != null));
 
+            Container.Register<ScriptLoader>(Reuse.Singleton);
             Container.Register<Codex>(Reuse.Singleton);
             Container.Register<Game.Game>(Reuse.Singleton);
+            Container.Register<MapGenerator>(Reuse.Singleton);
 
             Container.Register<RootView>(Reuse.Singleton);
             Container.Register<MapView>(Reuse.Singleton);

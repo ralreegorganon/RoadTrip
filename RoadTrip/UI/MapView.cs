@@ -52,7 +52,7 @@ namespace RoadTrip.UI
                 var c = new Coordinate(wp.X, wp.Y, cameraFocusPosition.Coordinate.Z);
                 if (Game.Map.Terrain.TryGetValue(c, out var terrain))
                 {
-                    Terminal.Color(terrain.Renderable.Color);
+                    Terminal.Color(terrain.Renderable.FgColor);
                     Put(sx, sy, terrain.Renderable.Symbol);
                 }
             }
@@ -65,7 +65,7 @@ namespace RoadTrip.UI
 
                 var screenPos = WorldToScreen(pos.Coordinate, worldFrameAbs, cameraFocusPosition.Coordinate);
                 if (screenPos != null) {
-                    Terminal.Color(render.Color);
+                    Terminal.Color(render.FgColor);
                     Put(screenPos.Value.X, screenPos.Value.Y, render.Symbol);
                 }
             }
