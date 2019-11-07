@@ -13,7 +13,6 @@ TerrainType t(string name, char sym, Color fg, bool isOpaque)
 }
 
 Codex.TerrainTypes = new List<TerrainType> {
-    t("t_wall", '#', Color.WhiteSmoke, true),
-    t("t_floor", '.', Color.WhiteSmoke, false)
+    t("t_wall", '#', ColorTranslator.FromHtml("#b1d1fc"), true),
+    t("t_floor", '.', ColorTranslator.FromHtml("#5e819d"), false)
 };
-
