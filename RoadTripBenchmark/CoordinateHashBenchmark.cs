@@ -1,7 +1,6 @@
-using BenchmarkDotNet.Attributes;
-using System.Collections.Generic;
 using System;
-
+using System.Collections.Generic;
+using BenchmarkDotNet.Attributes;
 
 namespace RoadTripBenchmark
 {
@@ -23,7 +22,10 @@ namespace RoadTripBenchmark
             return o is CoordinateA other && Equals(other);
         }
 
-        public override int GetHashCode() => HashCode.Combine(X, Y, Z);
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(X, Y, Z);
+        }
 
         public bool Equals(CoordinateA other)
         {
@@ -49,7 +51,8 @@ namespace RoadTripBenchmark
             return o is CoordinateB other && Equals(other);
         }
 
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             unchecked {
                 const ulong a = 2862933555777941757;
                 var hashCode = (ulong) Z;
@@ -80,8 +83,8 @@ namespace RoadTripBenchmark
         public void GlobalSetup()
         {
             var r = new Random();
-            for(var x = 0; x < 4096; x++) {
-                for(var y = 0; y < 4096; y++) {
+            for (var x = 0; x < 4096; x++) {
+                for (var y = 0; y < 4096; y++) {
                     HashSetA.Add(new CoordinateA(x, y, 0));
                     HashSetB.Add(new CoordinateB(x, y, 0));
                     DictionaryA[new CoordinateA(x, y, 0)] = true;
@@ -89,7 +92,7 @@ namespace RoadTripBenchmark
                 }
             }
 
-            for(var i = 0; i < 10000; i++) {
+            for (var i = 0; i < 10000; i++) {
                 var x = r.Next(0, 4096);
                 var y = r.Next(0, 4096);
                 LookupA.Add(new CoordinateA(x, y, 0));
@@ -101,11 +104,12 @@ namespace RoadTripBenchmark
         public int HashSetOptionA()
         {
             var hits = 0;
-            foreach(var c in LookupA) {
-                if(HashSetA.Contains(c)) {
+            foreach (var c in LookupA) {
+                if (HashSetA.Contains(c)) {
                     hits++;
                 }
             }
+
             return hits;
         }
 
@@ -113,11 +117,12 @@ namespace RoadTripBenchmark
         public int HashSetOptionB()
         {
             var hits = 0;
-            foreach(var c in LookupB) {
-                if(HashSetB.Contains(c)) {
+            foreach (var c in LookupB) {
+                if (HashSetB.Contains(c)) {
                     hits++;
                 }
             }
+
             return hits;
         }
 
@@ -125,13 +130,14 @@ namespace RoadTripBenchmark
         public int DictionaryOptionA()
         {
             var hits = 0;
-            foreach(var c in LookupA) {
-                if(DictionaryA.TryGetValue(c, out var it)) {
-                    if(it) {
+            foreach (var c in LookupA) {
+                if (DictionaryA.TryGetValue(c, out var it)) {
+                    if (it) {
                         hits++;
                     }
                 }
             }
+
             return hits;
         }
 
@@ -139,13 +145,14 @@ namespace RoadTripBenchmark
         public int DictionaryOptionB()
         {
             var hits = 0;
-            foreach(var c in LookupB) {
-                if(DictionaryB.TryGetValue(c, out var it)) {
-                    if(it) {
+            foreach (var c in LookupB) {
+                if (DictionaryB.TryGetValue(c, out var it)) {
+                    if (it) {
                         hits++;
                     }
                 }
             }
+
             return hits;
         }
     }

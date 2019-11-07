@@ -4,16 +4,16 @@ namespace RoadTrip.Game.Mapgen
 {
     public class MapGenerator
     {
-        public Codex Codex { get; set; }
-
         public MapGenerator(Codex codex)
         {
             Codex = codex;
         }
 
+        public Codex Codex { get; set; }
+
         public Map Generate()
         {
-            Random r = new Random();
+            var r = new Random();
 
             var map = new Map();
 
@@ -21,11 +21,9 @@ namespace RoadTrip.Game.Mapgen
             var floor = Codex.TerrainLookup["t_floor"];
 
             var z = 0;
-            for (var x = 0; x < 32; x++)
-            {
-                for(var y = 0; y < 32; y++)
-                {
-                    if (x == 0 || x == 31 || y == 0 || y == 31) {
+            for (var x = 0; x < 256; x++) {
+                for (var y = 0; y < 256; y++) {
+                    if (x == 0 || x == 255 || y == 0 || y == 255) {
                         map.Terrain[new Coordinate(x, y, z)] = wall;
                     }
                     else {
@@ -34,16 +32,8 @@ namespace RoadTrip.Game.Mapgen
                 }
             }
 
-            for (var x = 15; x < 17; x++)
-            {
-                for (var y = 15; y < 17; y++)
-                {
-                    map.Terrain[new Coordinate(x, y, z)] = wall;
-                }
-            }
-
-            for (var i = 0; i < 100; i++) {
-                map.Terrain[new Coordinate(r.Next(1, 30), r.Next(1, 30), z)] = wall;
+            for (var i = 0; i < 10000; i++) {
+                map.Terrain[new Coordinate(r.Next(1, 255), r.Next(1, 255), z)] = wall;
             }
 
             return map;

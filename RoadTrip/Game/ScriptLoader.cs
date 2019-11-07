@@ -10,32 +10,24 @@ namespace RoadTrip.Game
 {
     public class ScriptGlobals
     {
+        public Codex Codex;
         public Game Game;
         public EcsWorld World;
-        public Codex Codex;
     }
 
     public class ScriptLoader
     {
-        private ILogger Logger { get; }
-
         public ScriptLoader(EcsWorld world, Game game, Codex codex, ILogger logger)
         {
             Logger = logger;
 
-            var scriptGlobals = new ScriptGlobals { Codex = codex, World = world, Game = game };
+            var scriptGlobals = new ScriptGlobals {Codex = codex, World = world, Game = game};
 
-            var opts = ScriptOptions.Default.AddImports(new[] {
-                "System",
-                "System.Collections.Generic",
-                "System.Drawing",
-                "RoadTrip.Game",
-                "RoadTrip.Game.Components"
-            });
+            var opts = ScriptOptions.Default.AddImports("System", "System.Collections.Generic", "System.Drawing", "RoadTrip.Game", "RoadTrip.Game.Components");
 
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.IsDynamic == false);
-            foreach (var assembly in assemblies)
-            {
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(x => x.IsDynamic == false);
+            foreach (var assembly in assemblies) {
                 opts.AddReferences(assembly);
             }
 
@@ -43,37 +35,35 @@ namespace RoadTrip.Game
                 .OrderBy(x => x)
                 .ToList();
 
-            foreach (var scriptPath in allScripts)
-            {
+            foreach (var scriptPath in allScripts) {
                 var code = File.ReadAllText(scriptPath);
                 var script = CSharpScript.Create(code, opts, typeof(ScriptGlobals));
                 var compilation = script.GetCompilation();
                 var diagnostics = compilation.GetDiagnostics();
-                if (diagnostics.Any())
-                {
+                if (diagnostics.Any()) {
                     var fail = false;
-                    foreach (var diagnostic in diagnostics)
-                    {
-                        if (diagnostic.WarningLevel == 0)
-                        {
+                    foreach (var diagnostic in diagnostics) {
+                        if (diagnostic.WarningLevel == 0) {
                             fail = true;
                             Logger.Fatal("Failed to execute {Script}: {Message}", scriptPath, diagnostic.ToString());
                         }
-                        else
-                        {
+                        else {
                             Logger.Error("Failed to execute {Script}: {Message}", scriptPath, diagnostic.ToString());
                         }
                     }
-                    if (fail)
-                    {
+
+                    if (fail) {
                         throw new Exception("Aborted due to script errors");
                     }
                 }
 
-                var result = script.RunAsync(globals: scriptGlobals).Result;
+                var result = script.RunAsync(scriptGlobals)
+                    .Result;
             }
 
             codex.TerrainLookup = codex.TerrainTypes.ToDictionary(k => k.Name, v => v);
         }
+
+        private ILogger Logger { get; }
     }
 }

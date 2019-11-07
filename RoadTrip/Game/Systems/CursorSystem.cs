@@ -4,7 +4,7 @@ using RoadTrip.Game.Components;
 namespace RoadTrip.Game.Systems
 {
     public class CursorSystem : IEcsRunSystem
-        {
+    {
         private EcsFilter<Position, CursorTag> CursorFilter { get; set; }
         private EcsFilter<Position, CameraFocusTag> CameraFocusFilter { get; set; }
 

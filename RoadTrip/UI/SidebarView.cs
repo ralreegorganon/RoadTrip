@@ -1,13 +1,10 @@
-﻿using System;
-
-namespace RoadTrip.UI
+﻿namespace RoadTrip.UI
 {
     public class SidebarView : View
     {
         public SidebarView()
         {
-            BorderStyle = new BorderStyle
-            {
+            BorderStyle = new BorderStyle {
                 NW = '╒',
                 SW = '╘',
                 NE = '╕',

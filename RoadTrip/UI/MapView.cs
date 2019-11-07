@@ -8,10 +8,6 @@ namespace RoadTrip.UI
 {
     public class MapView : View
     {
-        private EcsWorld World { get; }
-
-        private Game.Game Game { get; }
-
         public MapView(Game.Game game, EcsWorld world)
         {
             Game = game;
@@ -30,6 +26,10 @@ namespace RoadTrip.UI
 
             Title = "Map";
         }
+
+        private EcsWorld World { get; }
+
+        private Game.Game Game { get; }
 
         public override void Draw()
         {
@@ -57,8 +57,7 @@ namespace RoadTrip.UI
                     continue;
                 }
 
-                if (Game.Map.Terrain.TryGetValue(c, out var terrain))
-                {
+                if (Game.Map.Terrain.TryGetValue(c, out var terrain)) {
                     Terminal.Color(terrain.Renderable.FgColor);
                     Put(sx, sy, terrain.Renderable.Symbol);
                 }

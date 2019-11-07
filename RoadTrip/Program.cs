@@ -13,19 +13,17 @@ namespace RoadTrip
     {
         private static void Main(string[] args)
         {
-            Log.Logger = new LoggerConfiguration()
-                .WriteTo.Debug(outputTemplate: "[{Timestamp:yyyyMMdd HH:mm:ss} {Level} {SourceContext}] - {Message:lj}{NewLine}{Exception}")
+            Log.Logger = new LoggerConfiguration().WriteTo.Debug(outputTemplate: "[{Timestamp:yyyyMMdd HH:mm:ss} {Level} {SourceContext}] - {Message:lj}{NewLine}{Exception}")
                 .WriteTo.File("log.txt", outputTemplate: "[{Timestamp:yyyyMMdd HH:mm:ss} {Level} {SourceContext}] - {Message:lj}{NewLine}{Exception}")
                 .CreateLogger();
 
-            try
-            {
+            try {
                 Log.Information("Starting up");
 
                 var god = new God();
-                
+
                 god.Container.Resolve<ScriptLoader>();
-                
+
                 var game = god.Container.Resolve<Game.Game>();
                 var rootView = god.Container.Resolve<RootView>();
 
@@ -33,61 +31,56 @@ namespace RoadTrip
                 game.Tick();
                 rootView.Draw();
 
-                while (game.Run)
-                {
-                    if (Terminal.HasInput())
-                    {
+                while (game.Run) {
+                    if (Terminal.HasInput()) {
                         var key = Terminal.Read();
                         EcsEntity? t = null;
-                        if (game.Player.Get<CameraFocusTag>() != null)
-                        {
+                        if (game.Player.Get<CameraFocusTag>() != null) {
                             t = game.Player;
                         }
-                        else if (game.Cursor.Get<CameraFocusTag>() != null)
-                        {
+                        else if (game.Cursor.Get<CameraFocusTag>() != null) {
                             t = game.Cursor;
                         }
-                        switch (key)
-                        {
+
+                        switch (key) {
                             case Terminal.TK_LEFT:
-                                if (t != null)
-                                {
+                                if (t != null) {
                                     var wtm = t.Value.Set<WantsToMove>();
                                     wtm.Movement = new Coordinate(-1, 0, 0);
                                 }
+
                                 break;
                             case Terminal.TK_RIGHT:
-                                if (t != null)
-                                {
+                                if (t != null) {
                                     var wtm = t.Value.Set<WantsToMove>();
                                     wtm.Movement = new Coordinate(1, 0, 0);
                                 }
+
                                 break;
                             case Terminal.TK_UP:
-                                if (t != null)
-                                {
+                                if (t != null) {
                                     var wtm = t.Value.Set<WantsToMove>();
                                     wtm.Movement = new Coordinate(0, -1, 0);
                                 }
+
                                 break;
                             case Terminal.TK_DOWN:
-                                if (t != null)
-                                {
+                                if (t != null) {
                                     var wtm = t.Value.Set<WantsToMove>();
                                     wtm.Movement = new Coordinate(0, 1, 0);
                                 }
+
                                 break;
                             case Terminal.TK_ENTER:
-                                if (game.Player.Get<CameraFocusTag>() != null)
-                                {
+                                if (game.Player.Get<CameraFocusTag>() != null) {
                                     game.Player.Unset<CameraFocusTag>();
                                     game.Cursor.Set<CameraFocusTag>();
                                 }
-                                else
-                                {
+                                else {
                                     game.Player.Set<CameraFocusTag>();
                                     game.Cursor.Unset<CameraFocusTag>();
                                 }
+
                                 break;
                             case Terminal.TK_CLOSE:
                                 game.Run = false;
@@ -106,8 +99,7 @@ namespace RoadTrip
 
                 Log.Information("Exiting");
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 Log.Fatal(e, "Unhandled exception");
                 throw;
             }

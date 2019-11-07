@@ -27,7 +27,10 @@ namespace RoadTrip.Game
             return o is Coordinate other && Equals(other);
         }
 
-        public override int GetHashCode() => HashCode.Combine(X, Y, Z);
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(X, Y, Z);
+        }
 
         public bool Equals(Coordinate other)
         {

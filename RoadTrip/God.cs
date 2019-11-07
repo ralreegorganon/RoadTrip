@@ -5,19 +5,18 @@ using RoadTrip.Game;
 using RoadTrip.Game.Mapgen;
 using RoadTrip.Game.Systems;
 using RoadTrip.UI;
+using Serilog;
 
 namespace RoadTrip
 {
     public class God
     {
-        public Container Container { get; }
-
         public God()
         {
             Container = new Container();
 
-            Container.Register(Made.Of(() => Serilog.Log.Logger), setup: Setup.With(condition: r => r.Parent.ImplementationType == null));
-            Container.Register(Made.Of(() => Serilog.Log.ForContext(Arg.Index<Type>(0)), r => r.Parent.ImplementationType), setup: Setup.With(condition: r => r.Parent.ImplementationType != null));
+            Container.Register(Made.Of(() => Log.Logger), setup: Setup.With(condition: r => r.Parent.ImplementationType == null));
+            Container.Register(Made.Of(() => Log.ForContext(Arg.Index<Type>(0)), r => r.Parent.ImplementationType), setup: Setup.With(condition: r => r.Parent.ImplementationType != null));
 
             Container.Register<ScriptLoader>(Reuse.Singleton);
             Container.Register<Codex>(Reuse.Singleton);
@@ -44,5 +43,7 @@ namespace RoadTrip
 
             systems.Init();
         }
+
+        public Container Container { get; }
     }
 }

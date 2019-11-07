@@ -6,6 +6,14 @@ namespace RoadTrip.Game
 {
     public class Game
     {
+        public Game(EcsWorld world, EcsSystems systems, MapGenerator mapGenerator, ILogger logger)
+        {
+            World = world;
+            Systems = systems;
+            Logger = logger;
+            MapGenerator = mapGenerator;
+        }
+
         public bool Run { get; set; } = true;
 
         public Map Map { get; set; } = new Map();
@@ -21,14 +29,6 @@ namespace RoadTrip.Game
         private EcsSystems Systems { get; }
 
         private ILogger Logger { get; }
-
-        public Game(EcsWorld world, EcsSystems systems, MapGenerator mapGenerator, ILogger logger)
-        {
-            World = world;
-            Systems = systems;
-            Logger = logger;
-            MapGenerator = mapGenerator;
-        }
 
         public void Setup()
         {

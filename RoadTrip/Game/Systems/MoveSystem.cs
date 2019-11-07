@@ -9,8 +9,7 @@ namespace RoadTrip.Game.Systems
 
         public void Run()
         {
-            foreach (var i in Filter)
-            {
+            foreach (var i in Filter) {
                 ref var entity = ref Filter.Entities[i];
                 var move = entity.Get<WantsToMove>();
                 var position = entity.Get<Position>();

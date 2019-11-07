@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Leopotam.Ecs;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Scripting;
-using Serilog;
+﻿using System.Collections.Generic;
 
 namespace RoadTrip.Game
 {

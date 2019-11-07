@@ -11,7 +11,7 @@ namespace RoadTripTest
         protected BaselineTest()
         {
             God = new God();
-            God.Container.Resolve<Codex>();
+            God.Container.Resolve<ScriptLoader>();
             var game = God.Container.Resolve<Game>();
             game.Setup();
         }

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Leopotam.Ecs;
+﻿using Leopotam.Ecs;
 using RoadTrip.Game.Components;
 
 namespace RoadTrip.Game.Systems
@@ -17,8 +16,7 @@ namespace RoadTrip.Game.Systems
 
         public void Run()
         {
-            foreach (var i in Filter)
-            {
+            foreach (var i in Filter) {
                 ref var entity = ref Filter.Entities[i];
 
                 var viewshed = entity.Get<Viewshed>();
@@ -32,11 +30,8 @@ namespace RoadTrip.Game.Systems
                 viewshed.Visible.Clear();
                 ShadowCaster.ComputeFieldOfViewWithShadowCasting(position.Coordinate.X, position.Coordinate.Y, viewshed.Range, (x, y) => {
                     var c = new Coordinate(x, y, position.Coordinate.Z);
-                    if (Game.Map.Terrain.TryGetValue(c, out var terrain)) {
-                        return terrain.IsOpaque;
-                    }
-                    return true;
-                }, (x, y) => viewshed.Visible.Add(new Coordinate(x, y, position.Coordinate.Z)) );
+                    return !Game.Map.Terrain.TryGetValue(c, out var terrain) || terrain.IsOpaque;
+                }, (x, y) => viewshed.Visible.Add(new Coordinate(x, y, position.Coordinate.Z)));
             }
         }
     }

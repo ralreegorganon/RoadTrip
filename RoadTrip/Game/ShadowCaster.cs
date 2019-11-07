@@ -13,8 +13,9 @@ namespace RoadTrip.Game
             var opaque = TranslateOrigin(isOpaque, x, y);
             var fov = TranslateOrigin(setFoV, x, y);
 
-            for (var octant = 0; octant < 8; ++octant)
+            for (var octant = 0; octant < 8; ++octant) {
                 ComputeFieldOfViewInOctantZero(TranslateOctant(opaque, octant), TranslateOctant(fov, octant), radius);
+            }
         }
 
         private static void ComputeFieldOfViewInOctantZero(Func<int, int, bool> isOpaque, Action<int, int> setFieldOfView, int radius)
@@ -23,8 +24,9 @@ namespace RoadTrip.Game
             queue.Enqueue(new ColumnPortion(0, new DirectionVector(1, 0), new DirectionVector(1, 1)));
             while (queue.Count != 0) {
                 var current = queue.Dequeue();
-                if (current.X > radius)
+                if (current.X > radius) {
                     continue;
+                }
 
                 ComputeFoVForColumnPortion(current.X, current.TopVector, current.BottomVector, isOpaque, setFieldOfView, radius, queue);
             }
@@ -34,8 +36,7 @@ namespace RoadTrip.Game
         // portion that are within the radius as in the field of view, and 
         // (2) it computes which portions of the following column are in the 
         // field of view, and puts them on a work queue for later processing. 
-        private static void ComputeFoVForColumnPortion(int x, DirectionVector topVector, DirectionVector bottomVector, Func<int, int, bool> isOpaque,
-            Action<int, int> setFieldOfView, int radius, Queue<ColumnPortion> queue)
+        private static void ComputeFoVForColumnPortion(int x, DirectionVector topVector, DirectionVector bottomVector, Func<int, int, bool> isOpaque, Action<int, int> setFieldOfView, int radius, Queue<ColumnPortion> queue)
         {
             // Search for transitions from opaque to transparent or
             // transparent to opaque and use those to determine what
@@ -51,10 +52,12 @@ namespace RoadTrip.Game
                 var quotient = (2 * x + 1) * topVector.Y / (2 * topVector.X);
                 var remainder = (2 * x + 1) * topVector.Y % (2 * topVector.X);
 
-                if (remainder > topVector.X)
+                if (remainder > topVector.X) {
                     topY = quotient + 1;
-                else
+                }
+                else {
                     topY = quotient;
+                }
             }
 
             // Note that this can find a top cell that is actually entirely blocked by
@@ -67,10 +70,12 @@ namespace RoadTrip.Game
                 var quotient = (2 * x - 1) * bottomVector.Y / (2 * bottomVector.X);
                 var remainder = (2 * x - 1) * bottomVector.Y % (2 * bottomVector.X);
 
-                if (remainder >= bottomVector.X)
+                if (remainder >= bottomVector.X) {
                     bottomY = quotient + 1;
-                else
+                }
+                else {
                     bottomY = quotient;
+                }
             }
 
             // A more sophisticated algorithm would say that a cell is visible if there is 
@@ -83,7 +88,9 @@ namespace RoadTrip.Game
                 var inRadius = IsInRadius(x, y, radius);
                 if (inRadius)
                     // The current cell is in the field of view.
+                {
                     setFieldOfView(x, y);
+                }
 
                 // A cell that was too far away to be seen is effectively
                 // an opaque cell; nothing "above" it is going to be visible
@@ -99,7 +106,9 @@ namespace RoadTrip.Game
                         if (!wasLastCellOpaque.Value)
                             // The new bottom vector touches the upper left corner of 
                             // opaque cell that is below the transparent cell. 
+                        {
                             queue.Enqueue(new ColumnPortion(x + 1, new DirectionVector(x * 2 - 1, y * 2 + 1), topVector));
+                        }
                     }
                     else if (wasLastCellOpaque.Value) {
                         // We've found a boundary from opaque to transparent. Adjust the
@@ -117,21 +126,8 @@ namespace RoadTrip.Game
             }
 
             // Make a note of the lowest opaque-->transparent transition, if there is one. 
-            if (wasLastCellOpaque != null && !wasLastCellOpaque.Value)
+            if (wasLastCellOpaque != null && !wasLastCellOpaque.Value) {
                 queue.Enqueue(new ColumnPortion(x + 1, bottomVector, topVector));
-        }
-
-        private struct ColumnPortion
-        {
-            public int X { get; }
-            public DirectionVector BottomVector { get; }
-            public DirectionVector TopVector { get; }
-
-            public ColumnPortion(int x, DirectionVector bottom, DirectionVector top) : this()
-            {
-                X = x;
-                BottomVector = bottom;
-                TopVector = top;
             }
         }
 
@@ -139,18 +135,6 @@ namespace RoadTrip.Game
         private static bool IsInRadius(int x, int y, int length)
         {
             return (2 * x - 1) * (2 * x - 1) + (2 * y - 1) * (2 * y - 1) <= 4 * length * length;
-        }
-
-        private struct DirectionVector
-        {
-            public int X { get; }
-            public int Y { get; }
-
-            public DirectionVector(int x, int y) : this()
-            {
-                X = x;
-                Y = y;
-            }
         }
 
         // Octant helpers
@@ -198,6 +182,32 @@ namespace RoadTrip.Game
                 case 5: return (x, y) => f(-y, -x);
                 case 6: return (x, y) => f(y, -x);
                 case 7: return (x, y) => f(x, -y);
+            }
+        }
+
+        private struct ColumnPortion
+        {
+            public int X { get; }
+            public DirectionVector BottomVector { get; }
+            public DirectionVector TopVector { get; }
+
+            public ColumnPortion(int x, DirectionVector bottom, DirectionVector top) : this()
+            {
+                X = x;
+                BottomVector = bottom;
+                TopVector = top;
+            }
+        }
+
+        private struct DirectionVector
+        {
+            public int X { get; }
+            public int Y { get; }
+
+            public DirectionVector(int x, int y) : this()
+            {
+                X = x;
+                Y = y;
             }
         }
     }
