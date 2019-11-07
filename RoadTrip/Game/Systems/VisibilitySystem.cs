@@ -29,21 +29,9 @@ namespace RoadTrip.Game.Systems
                 }
 
                 viewshed.Dirty = false;
-                viewshed.Visible = DeriveViewshed(position.Coordinate, Game.Map);
+                viewshed.Visible.Clear();
+                ShadowCaster.ComputeFieldOfViewWithShadowCasting(position.Coordinate.X, position.Coordinate.Y, viewshed.Range, (x, y) => { return false; }, (x, y) => viewshed.Visible.Add(new Coordinate(x, y, position.Coordinate.Z)) );
             }
-        }
-
-        private HashSet<Coordinate> DeriveViewshed(Coordinate coordinate, Map map)
-        {
-            var viewshed = new HashSet<Coordinate>();
-
-            for (var dx = -8; dx <= 8; dx++) {
-                for (var dy = -8; dy <= 8; dy++) {
-                    viewshed.Add(coordinate + new Coordinate(dx, dy, 0));
-                }
-            }
-
-            return viewshed;
         }
     }
 }
