@@ -26,12 +26,19 @@ namespace RoadTrip.Game.Systems
                     continue;
                 }
 
+                var mapMemory = entity.Get<MapMemory>();
+
                 viewshed.Dirty = false;
                 viewshed.Visible.Clear();
+
                 ShadowCaster.ComputeFieldOfViewWithShadowCasting(position.Coordinate.X, position.Coordinate.Y, viewshed.Range, (x, y) => {
                     var c = new Coordinate(x, y, position.Coordinate.Z);
                     return !Game.Map.Terrain.TryGetValue(c, out var terrain) || terrain.IsOpaque;
-                }, (x, y) => viewshed.Visible.Add(new Coordinate(x, y, position.Coordinate.Z)));
+                }, (x, y) => {
+                    var c = new Coordinate(x, y, position.Coordinate.Z);
+                    mapMemory?.Remembered.Add(c);
+                    viewshed.Visible.Add(c);
+                });
             }
         }
     }

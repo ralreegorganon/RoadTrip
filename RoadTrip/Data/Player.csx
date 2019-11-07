@@ -10,3 +10,6 @@ var viewshed = Game.Player.Set<Viewshed>();
 viewshed.Visible = new HashSet<Coordinate>();
 viewshed.Range = 12;
 viewshed.Dirty = true;
+
+var mapMemory = Game.Player.Set<MapMemory>();
+mapMemory.Remembered = new HashSet<Coordinate>();

@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using BearLib;
 using Leopotam.Ecs;
 using RoadTrip.Game;
@@ -45,6 +46,7 @@ namespace RoadTrip.UI
             var cameraFocusPosition = cameraFocus.Get<Position>();
 
             var viewshed = Game.Player.Get<Viewshed>();
+            var mapMemory = Game.Player.Get<MapMemory>();
 
             var worldFrameAbs = new Rectangle(cameraFocusPosition.Coordinate.X - ScreenFrameAbs.Width / 2, cameraFocusPosition.Coordinate.Y - ScreenFrameAbs.Height / 2, ScreenFrameAbs.Width, ScreenFrameAbs.Height);
 
@@ -53,14 +55,29 @@ namespace RoadTrip.UI
                 var wp = Point.Add(worldFrameAbs.Location, new Size(sx, sy));
                 var c = new Coordinate(wp.X, wp.Y, cameraFocusPosition.Coordinate.Z);
 
-                if (!viewshed.Visible.Contains(c)) {
+                // We never forget and anything visible is in memory...
+                var remembered = mapMemory.Remembered.Contains(c);
+                if (!remembered) {
                     continue;
                 }
 
-                if (Game.Map.Terrain.TryGetValue(c, out var terrain)) {
-                    Terminal.Color(terrain.Renderable.FgColor);
-                    Put(sx, sy, terrain.Renderable.Symbol);
+                // If there's nothing to draw here... don't.
+                if (!Game.Map.Terrain.TryGetValue(c, out var terrain)) {
+                    continue;
                 }
+
+                var visible = viewshed.Visible.Contains(c);
+                if (visible) {
+                    Terminal.Color(terrain.Renderable.FgColor);
+                }
+                else {
+                    var luminosity = ((0.21 * terrain.Renderable.FgColor.R) + (0.72 * terrain.Renderable.FgColor.G) + (0.07 * terrain.Renderable.FgColor.B)) / 3;
+                    var gray = Convert.ToInt32(luminosity);
+                    var newColor = Color.FromArgb(255, gray, gray, gray);
+                    Terminal.Color(newColor);
+                }
+
+                Put(sx, sy, terrain.Renderable.Symbol);
             }
 
             var renderable = World.GetFilter(typeof(EcsFilter<Position, Renderable>));
