@@ -6,5 +6,6 @@ namespace RoadTrip.Game
     {
         public string Name { get; set; }
         public Renderable Renderable { get; set; }
+        public bool IsOpaque { get; set; }
     }
 }
