@@ -20,6 +20,7 @@
 * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#nullable disable
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -222,19 +223,21 @@ namespace BearLib
         {
             var bitmaps = new Dictionary<Bitmap, BitmapData>();
             for (var i = 0; i < args.Length; i++) {
-                if (args[i] is Bitmap) {
-                    var bitmap = args[i] as Bitmap;
-                    var data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-                    bitmaps[bitmap] = data;
-                    args[i] = string.Format("0x{0:X}", (ulong) data.Scan0.ToInt64());
-                }
-                else if (args[i] is Size) {
-                    var size = (Size) args[i];
-                    args[i] = string.Format("{0}x{1}", size.Width, size.Height);
-                }
-                else if (args[i] is bool) {
-                    var value = (bool) args[i];
-                    args[i] = value ? "true" : "false";
+                switch (args[i]) {
+                    case Bitmap bitmap: {
+                        var data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+                        bitmaps[bitmap] = data;
+                        args[i] = $"0x{(ulong) data.Scan0.ToInt64():X}";
+                        break;
+                    }
+                    case Size size: {
+                        args[i] = $"{size.Width}x{size.Height}";
+                        break;
+                    }
+                    case bool value: {
+                        args[i] = value ? "true" : "false";
+                        break;
+                    }
                 }
             }
 
@@ -582,3 +585,4 @@ namespace BearLib
         }
     }
 }
+#nullable enable

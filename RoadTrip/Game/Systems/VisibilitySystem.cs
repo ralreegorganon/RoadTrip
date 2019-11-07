@@ -12,11 +12,11 @@ namespace RoadTrip.Game.Systems
 
         public Game Game { get; set; }
 
-        private EcsFilter<Position, Viewshed> Filter { get; set; }
+        private EcsFilter<Position, Viewshed>? Filter { get; set; }
 
         public void Run()
         {
-            foreach (var i in Filter) {
+            foreach (var i in Filter!) {
                 ref var entity = ref Filter.Entities[i];
 
                 var viewshed = entity.Get<Viewshed>();

@@ -22,7 +22,7 @@ namespace RoadTrip.Game
             z = Z;
         }
 
-        public override bool Equals(object o)
+        public override bool Equals(object? o)
         {
             return o is Coordinate other && Equals(other);
         }

@@ -5,12 +5,12 @@ namespace RoadTrip.Game.Systems
 {
     public class CursorSystem : IEcsRunSystem
     {
-        private EcsFilter<Position, CursorTag> CursorFilter { get; set; }
-        private EcsFilter<Position, CameraFocusTag> CameraFocusFilter { get; set; }
+        private EcsFilter<Position, CursorTag>? CursorFilter { get; set; }
+        private EcsFilter<Position, CameraFocusTag>? CameraFocusFilter { get; set; }
 
         public void Run()
         {
-            if (CursorFilter.IsEmpty() || CameraFocusFilter.IsEmpty()) {
+            if (CursorFilter!.IsEmpty() || CameraFocusFilter!.IsEmpty()) {
                 return;
             }
 

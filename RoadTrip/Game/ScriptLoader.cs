@@ -10,6 +10,13 @@ namespace RoadTrip.Game
 {
     public class ScriptGlobals
     {
+        public ScriptGlobals(Codex codex, Game game, EcsWorld world)
+        {
+            Codex = codex;
+            Game = game;
+            World = world;
+        }
+
         public Codex Codex;
         public Game Game;
         public EcsWorld World;
@@ -21,7 +28,7 @@ namespace RoadTrip.Game
         {
             Logger = logger;
 
-            var scriptGlobals = new ScriptGlobals {Codex = codex, World = world, Game = game};
+            var scriptGlobals = new ScriptGlobals(codex, game, world);
 
             var opts = ScriptOptions.Default.AddImports("System", "System.Collections.Generic", "System.Drawing", "RoadTrip.Game", "RoadTrip.Game.Components");
 
@@ -61,7 +68,7 @@ namespace RoadTrip.Game
                     .Result;
             }
 
-            codex.TerrainLookup = codex.TerrainTypes.ToDictionary(k => k.Name, v => v);
+            codex.TerrainLookup = codex.TerrainTypes.ToDictionary(k => k.Id, v => v);
         }
 
         private ILogger Logger { get; }
