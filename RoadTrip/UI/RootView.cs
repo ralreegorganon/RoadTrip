@@ -14,6 +14,7 @@ namespace RoadTrip.UI
             Terminal.Set($"window: title='road trip', resizeable=true, size=80x24;");
             Terminal.Set("text font: ./Cascadia.ttf, size=16x16");
             Terminal.Set("font: ./Topaz-8.ttf, size=8");
+            Terminal.Set("output: vsync=false;");
 
             Resize();
         }

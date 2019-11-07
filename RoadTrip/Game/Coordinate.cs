@@ -27,20 +27,7 @@ namespace RoadTrip.Game
             return o is Coordinate other && Equals(other);
         }
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                const ulong a = 2862933555777941757;
-                var hashCode = (ulong) Z;
-                hashCode *= a;
-                hashCode += (ulong) Y;
-                hashCode *= a;
-                hashCode += (ulong) X;
-
-                return (int) hashCode;
-            }
-        }
+        public override int GetHashCode() => HashCode.Combine(X, Y, Z);
 
         public bool Equals(Coordinate other)
         {

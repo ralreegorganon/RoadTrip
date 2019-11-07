@@ -1,4 +1,6 @@
-﻿namespace RoadTrip.Game.Mapgen
+﻿using System;
+
+namespace RoadTrip.Game.Mapgen
 {
     public class MapGenerator
     {
@@ -11,6 +13,8 @@
 
         public Map Generate()
         {
+            Random r = new Random();
+
             var map = new Map();
 
             var wall = Codex.TerrainLookup["t_wall"];
@@ -36,6 +40,10 @@
                 {
                     map.Terrain[new Coordinate(x, y, z)] = wall;
                 }
+            }
+
+            for (var i = 0; i < 100; i++) {
+                map.Terrain[new Coordinate(r.Next(1, 30), r.Next(1, 30), z)] = wall;
             }
 
             return map;

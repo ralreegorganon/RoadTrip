@@ -8,5 +8,5 @@ playerRenderable.Symbol = '@';
 
 var viewshed = Game.Player.Set<Viewshed>();
 viewshed.Visible = new HashSet<Coordinate>();
-viewshed.Range = 8;
+viewshed.Range = 12;
 viewshed.Dirty = true;
