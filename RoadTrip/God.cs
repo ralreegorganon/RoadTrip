@@ -34,9 +34,11 @@ namespace RoadTrip
             Container.Register<DummyFilterSystem>(Reuse.Singleton);
             Container.Register<MoveSystem>(Reuse.Singleton);
             Container.Register<CursorSystem>(Reuse.Singleton);
+            Container.Register<VisibilitySystem>(Reuse.Singleton);
 
             var systems = Container.Resolve<EcsSystems>();
             systems.Add(Container.Resolve<DummyFilterSystem>());
+            systems.Add(Container.Resolve<VisibilitySystem>());
             systems.Add(Container.Resolve<MoveSystem>());
             systems.Add(Container.Resolve<CursorSystem>());
 

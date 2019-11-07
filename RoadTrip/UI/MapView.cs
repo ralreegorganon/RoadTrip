@@ -44,12 +44,19 @@ namespace RoadTrip.UI
             ref var cameraFocus = ref cameraFocusFilter.Entities[0];
             var cameraFocusPosition = cameraFocus.Get<Position>();
 
+            var viewshed = Game.Player.Get<Viewshed>();
+
             var worldFrameAbs = new Rectangle(cameraFocusPosition.Coordinate.X - ScreenFrameAbs.Width / 2, cameraFocusPosition.Coordinate.Y - ScreenFrameAbs.Height / 2, ScreenFrameAbs.Width, ScreenFrameAbs.Height);
 
             for (var sx = 0; sx < ScreenFrameAbs.Width; sx++)
             for (var sy = 0; sy < ScreenFrameAbs.Height; sy++) {
                 var wp = Point.Add(worldFrameAbs.Location, new Size(sx, sy));
                 var c = new Coordinate(wp.X, wp.Y, cameraFocusPosition.Coordinate.Z);
+
+                if (!viewshed.Visible.Contains(c)) {
+                    continue;
+                }
+
                 if (Game.Map.Terrain.TryGetValue(c, out var terrain))
                 {
                     Terminal.Color(terrain.Renderable.FgColor);

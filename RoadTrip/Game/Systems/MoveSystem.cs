@@ -18,6 +18,11 @@ namespace RoadTrip.Game.Systems
                 position.Coordinate += move.Movement;
 
                 entity.Unset<WantsToMove>();
+
+                var viewshed = entity.Get<Viewshed>();
+                if (viewshed != null) {
+                    viewshed.Dirty = true;
+                }
             }
         }
     }
