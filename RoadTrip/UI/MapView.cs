@@ -98,27 +98,66 @@ namespace RoadTrip.UI
                 var from = Game.Player.Get<Position>();
                 var to = Game.Cursor.Get<Position>();
 
-                Terminal.Composition(true);
-
-                foreach (var c in Bresenham.Line(from.Coordinate, to.Coordinate).Skip(1)) {
-                    var screenPos = WorldToScreen(c, worldFrameAbs, cameraFocusPosition.Coordinate);
-                    if (screenPos != null)
+                if (false) {
+                    var bpath = Bresenham.Line(from.Coordinate, to.Coordinate)
+                        .Skip(1);
+                    Terminal.Composition(true);
+                    foreach (var c in bpath)
                     {
-                        Terminal.Color(Color.FromArgb(128, 255, 0, 0));
-                        Put(screenPos.Value.X, screenPos.Value.Y, '█');
-
-                        if (c == to.Coordinate)
+                        var screenPos = WorldToScreen(c, worldFrameAbs, cameraFocusPosition.Coordinate);
+                        if (screenPos != null)
                         {
-                            Terminal.Color(Color.Red);
-                            Put(screenPos.Value.X, screenPos.Value.Y, '▔');
-                            Put(screenPos.Value.X, screenPos.Value.Y, '▁');
-                            Put(screenPos.Value.X, screenPos.Value.Y, '▏');
-                            Put(screenPos.Value.X, screenPos.Value.Y, '▕');
+                            Terminal.Color(Color.FromArgb(128, 255, 0, 0));
+                            Put(screenPos.Value.X, screenPos.Value.Y, '█');
+
+                            if (c == to.Coordinate)
+                            {
+                                Terminal.Color(Color.Red);
+                                Put(screenPos.Value.X, screenPos.Value.Y, '▔');
+                                Put(screenPos.Value.X, screenPos.Value.Y, '▁');
+                                Put(screenPos.Value.X, screenPos.Value.Y, '▏');
+                                Put(screenPos.Value.X, screenPos.Value.Y, '▕');
+                            }
                         }
                     }
+                    Terminal.Composition(false);
                 }
+                else {
+                    var xpath = XiaolinWu.Line(from.Coordinate, to.Coordinate).Where(x => {
+                        if (x.C == to.Coordinate) {
+                            return true;
+                        }
 
-                Terminal.Composition(false);
+                        var hasChance = x.A > 0;
+                        if (!hasChance) {
+                            return false;
+                        }
+
+                        return viewshed.Visible.Contains(x.C);
+                    }).Skip(1).ToList();
+
+                    var color = viewshed.Visible.Contains(to.Coordinate) ? Color.LawnGreen : Color.Red;
+
+                    Terminal.Composition(true);
+                    foreach (var c in xpath)
+                    {
+                        var screenPos = WorldToScreen(c.C, worldFrameAbs, cameraFocusPosition.Coordinate);
+                        if (screenPos != null) {
+                            Terminal.Color(Color.FromArgb((int)(180 * c.A), color.R, color.G, color.B));
+                            Put(screenPos.Value.X, screenPos.Value.Y, '█');
+
+                            if (c.C == to.Coordinate)
+                            {
+                                Terminal.Color(color);
+                                Put(screenPos.Value.X, screenPos.Value.Y, '▔');
+                                Put(screenPos.Value.X, screenPos.Value.Y, '▁');
+                                Put(screenPos.Value.X, screenPos.Value.Y, '▏');
+                                Put(screenPos.Value.X, screenPos.Value.Y, '▕');
+                            }
+                        }
+                    }
+                    Terminal.Composition(false);
+                }
             }
         }
 
