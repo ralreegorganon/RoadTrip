@@ -19,38 +19,12 @@ namespace RoadTrip
                 Log.Information("Starting up");
 
                 var god = new God();
-
-                var inputResolver = god.Container.Resolve<InputResolver>();
-
                 god.Container.Resolve<ScriptLoader>();
-
-                var game = god.Container.Resolve<Game.Game>();
                 var rootView = god.Container.Resolve<RootView>();
-
-                game.Setup();
-                game.Tick();
-                rootView.Draw();
-
-                while (game.Run) {
-                    if (Terminal.HasInput()) {
-                        var key = Terminal.Read();
-
-                        switch (key)
-                        {
-                            case Terminal.TK_RESIZED:
-                                rootView.Resize();
-                                break;
-                            default:
-                                var command = inputResolver.Resolve(rootView.CurrentInputContext, key);
-                                command.Act(game, rootView);
-                                break;
-                        }
-                    }
-
-                    game.Tick();
-                    rootView.Draw();
+                rootView.Tick();
+                while (rootView.Game.Run) {
+                    rootView.Tick();
                 }
-
                 Terminal.Close();
                 Log.Information("Exiting");
             }

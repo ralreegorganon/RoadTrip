@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using BearLib;
 using Leopotam.Ecs;
 using RoadTrip.Game;
@@ -32,9 +33,9 @@ namespace RoadTrip.UI
 
         private Game.Game Game { get; }
 
-        public override void Draw()
+        public override void Draw(RunState currentRunState)
         {
-            base.Draw();
+            base.Draw(currentRunState);
 
             var cameraFocusFilter = World.GetFilter(typeof(EcsFilter<Position, CameraFocusTag>));
 
@@ -91,6 +92,33 @@ namespace RoadTrip.UI
                     Terminal.Color(render.FgColor);
                     Put(screenPos.Value.X, screenPos.Value.Y, render.Symbol);
                 }
+            }
+
+            if (CurrentRunState == RunState.ShowTargeting) {
+                var from = Game.Player.Get<Position>();
+                var to = Game.Cursor.Get<Position>();
+
+                Terminal.Composition(true);
+
+                foreach (var c in Bresenham.Line(from.Coordinate, to.Coordinate).Skip(1)) {
+                    var screenPos = WorldToScreen(c, worldFrameAbs, cameraFocusPosition.Coordinate);
+                    if (screenPos != null)
+                    {
+                        Terminal.Color(Color.FromArgb(128, 255, 0, 0));
+                        Put(screenPos.Value.X, screenPos.Value.Y, '█');
+
+                        if (c == to.Coordinate)
+                        {
+                            Terminal.Color(Color.Red);
+                            Put(screenPos.Value.X, screenPos.Value.Y, '▔');
+                            Put(screenPos.Value.X, screenPos.Value.Y, '▁');
+                            Put(screenPos.Value.X, screenPos.Value.Y, '▏');
+                            Put(screenPos.Value.X, screenPos.Value.Y, '▕');
+                        }
+                    }
+                }
+
+                Terminal.Composition(false);
             }
         }
 

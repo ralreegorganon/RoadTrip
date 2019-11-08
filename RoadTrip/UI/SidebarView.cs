@@ -30,9 +30,9 @@ namespace RoadTrip.UI
 
         private Game.Game Game { get; }
 
-        public override void Draw()
+        public override void Draw(RunState currentRunState)
         {
-            base.Draw();
+            base.Draw(currentRunState);
 
             var cameraFocusFilter = World.GetFilter(typeof(EcsFilter<Position, CameraFocusTag>));
 

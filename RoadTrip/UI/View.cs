@@ -11,8 +11,12 @@ namespace RoadTrip.UI
 
         protected string? Title { get; set; }
 
-        public virtual void Draw()
+        protected RunState CurrentRunState { get; set; }
+
+        public virtual void Draw(RunState currentRunState)
         {
+            CurrentRunState = currentRunState;
+
             DrawBorders();
             DrawTitle();
         }

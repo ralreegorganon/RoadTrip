@@ -1,16 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.InteropServices.ComTypes;
+using System.Runtime.InteropServices;
 using BearLib;
 using RoadTrip.Game.Commands;
 
 namespace RoadTrip.UI
 {
-    public enum InputContext
-    {
-        PlayerDirectControl,
-        CursorDirectControl
-    }
-
     public enum Command
     {
         Quit,
@@ -22,29 +16,33 @@ namespace RoadTrip.UI
         MoveCursorSouth,
         MoveCursorEast,
         MoveCursorWest,
+        ShowTargeting,
+        CancelTargeting,
+        CommitTargeting,
         TogglePlayerCursorCameraFocus,
         None
     }
 
     public class InputResolver
     {
-        private Dictionary<(InputContext, int), Command?> KeyMapping { get; } 
+        private Dictionary<(RunState, int), Command?> KeyMapping { get; } 
         private Dictionary<Command, GameCommand> CommandMapping { get; } 
 
         public InputResolver()
         {
-            KeyMapping = new Dictionary<(InputContext, int), Command?> {
-                {(InputContext.PlayerDirectControl, Terminal.TK_UP), Command.MovePlayerNorth},
-                {(InputContext.PlayerDirectControl, Terminal.TK_DOWN), Command.MovePlayerSouth},
-                {(InputContext.PlayerDirectControl, Terminal.TK_LEFT), Command.MovePlayerWest},
-                {(InputContext.PlayerDirectControl, Terminal.TK_RIGHT), Command.MovePlayerEast},
-                {(InputContext.PlayerDirectControl, Terminal.TK_ENTER), Command.TogglePlayerCursorCameraFocus},
-                {(InputContext.CursorDirectControl, Terminal.TK_UP), Command.MoveCursorNorth},
-                {(InputContext.CursorDirectControl, Terminal.TK_DOWN), Command.MoveCursorSouth},
-                {(InputContext.CursorDirectControl, Terminal.TK_LEFT), Command.MoveCursorWest},
-                {(InputContext.CursorDirectControl, Terminal.TK_RIGHT), Command.MoveCursorEast},
-                {(InputContext.CursorDirectControl, Terminal.TK_CLOSE), Command.Quit},
-                {(InputContext.CursorDirectControl, Terminal.TK_ENTER), Command.TogglePlayerCursorCameraFocus},
+            KeyMapping = new Dictionary<(RunState, int), Command?> {
+                {(RunState.AwaitingInput, Terminal.TK_UP), Command.MovePlayerNorth},
+                {(RunState.AwaitingInput, Terminal.TK_DOWN), Command.MovePlayerSouth},
+                {(RunState.AwaitingInput, Terminal.TK_LEFT), Command.MovePlayerWest},
+                {(RunState.AwaitingInput, Terminal.TK_RIGHT), Command.MovePlayerEast},
+                {(RunState.AwaitingInput, Terminal.TK_F), Command.ShowTargeting},
+                {(RunState.ShowTargeting, Terminal.TK_UP), Command.MoveCursorNorth},
+                {(RunState.ShowTargeting, Terminal.TK_DOWN), Command.MoveCursorSouth},
+                {(RunState.ShowTargeting, Terminal.TK_LEFT), Command.MoveCursorWest},
+                {(RunState.ShowTargeting, Terminal.TK_RIGHT), Command.MoveCursorEast},
+                {(RunState.ShowTargeting, Terminal.TK_CLOSE), Command.Quit},
+                {(RunState.ShowTargeting, Terminal.TK_ENTER), Command.CommitTargeting},
+                {(RunState.ShowTargeting, Terminal.TK_ESCAPE), Command.CancelTargeting},
             };
 
             CommandMapping = new Dictionary<Command, GameCommand> {
@@ -58,11 +56,13 @@ namespace RoadTrip.UI
                 {Command.MoveCursorSouth, new MoveCursorSouth()},
                 {Command.MoveCursorEast, new MoveCursorEast()},
                 {Command.MoveCursorWest, new MoveCursorWest()},
-                {Command.TogglePlayerCursorCameraFocus, new TogglePlayerCursorCameraFocus()},
+                {Command.ShowTargeting, new ShowTargeting()},
+                {Command.CancelTargeting, new CancelTargeting()},
+                {Command.CommitTargeting, new CommitTargeting()},
             };
         }
 
-        public GameCommand Resolve(InputContext context, int key)
+        public GameCommand Resolve(RunState context, int key)
         {
             KeyMapping.TryGetValue((context, key), out var keyCommand);
             if (keyCommand == null) {

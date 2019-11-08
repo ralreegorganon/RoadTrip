@@ -39,9 +39,9 @@ namespace RoadTrip
 
             var systems = Container.Resolve<EcsSystems>();
             systems.Add(Container.Resolve<DummyFilterSystem>());
-            systems.Add(Container.Resolve<VisibilitySystem>());
-            systems.Add(Container.Resolve<MoveSystem>());
-            systems.Add(Container.Resolve<CursorSystem>());
+            systems.Add(Container.Resolve<VisibilitySystem>(), nameof(VisibilitySystem));
+            systems.Add(Container.Resolve<MoveSystem>(), nameof(MoveSystem));
+            systems.Add(Container.Resolve<CursorSystem>(), nameof(CursorSystem));
 
             systems.Init();
         }

@@ -1,14 +1,23 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using BearLib;
 
 namespace RoadTrip.UI
 {
+    public enum RunState
+    {
+        AwaitingInput,
+        PlayerTurn,
+        ShowTargeting
+    }
+
     public class RootView : View
     {
-        public RootView(MapView mapView, SidebarView sidebarView)
+        public RootView(Game.Game game, InputResolver inputResolver, MapView mapView, SidebarView sidebarView)
         {
+            Game = game;
+            InputResolver = inputResolver;
             MapView = mapView;
             SidebarView = sidebarView;
 
@@ -20,27 +29,73 @@ namespace RoadTrip.UI
 
             Resize();
 
-            PushInputContext(InputContext.PlayerDirectControl);
+            Game.Setup();
+            Game.Tick();
+
+            RunStateStack.Push(RunState.AwaitingInput);
         }
+        public InputResolver InputResolver { get; set; }
 
-        private Stack<InputContext> Context { get; } = new Stack<InputContext>();
-
-        public InputContext CurrentInputContext => Context.Peek();
-
-        public void PushInputContext(InputContext context) => Context.Push(context);
-
-        public void PopInputContext() => Context.Pop();
+        public Game.Game Game { get; set; }
 
         public MapView MapView { get; }
 
         public SidebarView SidebarView { get; }
 
-        public override void Draw()
+        private Stack<RunState> RunStateStack { get; } = new Stack<RunState>();
+
+        public void Tick()
         {
             Terminal.Clear();
-            Terminal.Layer(1);
-            MapView.Draw();
-            SidebarView.Draw();
+
+            Game.Tick();
+
+            var currentRunState = RunStateStack.Peek();
+            switch (currentRunState)
+            {
+                case RunState.AwaitingInput:
+                    Game.DisableGameplaySystems();
+                    MapView.Draw(currentRunState);
+                    SidebarView.Draw(currentRunState);
+                    break;
+                case RunState.PlayerTurn:
+                    Game.EnableGameplaySystems();
+                    MapView.Draw(currentRunState);
+                    SidebarView.Draw(currentRunState);
+                    RunStateStack.Pop();
+                    RunStateStack.Push(RunState.AwaitingInput);
+                    break;
+                case RunState.ShowTargeting:
+                    Game.DisableGameplaySystems();
+                    MapView.Draw(currentRunState);
+                    SidebarView.Draw(currentRunState);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            if (Terminal.HasInput())
+            {
+                var key = Terminal.Read();
+                switch (key)
+                {
+                    case Terminal.TK_RESIZED:
+                        Resize();
+                        break;
+                    default:
+                        var command = InputResolver.Resolve(RunStateStack.Peek(), key);
+                        var (popCurrentState, pushState) = command.Act(Game);
+                        if (popCurrentState) {
+                            RunStateStack.Pop();
+                        }
+
+                        if (pushState != null) {
+                            RunStateStack.Push(pushState.Value);
+                        }
+                        break;
+                }
+            }
+            
             Terminal.Refresh();
         }
 

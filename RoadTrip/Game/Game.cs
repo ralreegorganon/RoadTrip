@@ -1,5 +1,7 @@
-﻿using Leopotam.Ecs;
+﻿using System.Collections.Generic;
+using Leopotam.Ecs;
 using RoadTrip.Game.Mapgen;
+using RoadTrip.Game.Systems;
 using Serilog;
 
 namespace RoadTrip.Game
@@ -39,6 +41,30 @@ namespace RoadTrip.Game
         {
             Systems.Run();
             World.EndFrame();
+        }
+
+        private List<string> GameplaySystems { get; } = new List<string> {
+            nameof(VisibilitySystem)
+        };
+
+        public void EnableGameplaySystems()
+        {
+            foreach (var s in GameplaySystems) {
+                var idx = Systems.GetNamedRunSystem(s);
+                if (!Systems.GetRunSystemState(idx)) {
+                    Systems.SetRunSystemState(idx, true);
+                }
+            }
+        }
+
+        public void DisableGameplaySystems()
+        {
+            foreach (var s in GameplaySystems) {
+                var idx = Systems.GetNamedRunSystem(s);
+                if (Systems.GetRunSystemState(idx)) {
+                    Systems.SetRunSystemState(idx, false);
+                }
+            }
         }
     }
 }
