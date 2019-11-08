@@ -1,9 +1,7 @@
 ﻿using System;
 using BearLib;
 using DryIoc;
-using Leopotam.Ecs;
 using RoadTrip.Game;
-using RoadTrip.Game.Components;
 using RoadTrip.UI;
 using Serilog;
 
@@ -22,6 +20,8 @@ namespace RoadTrip
 
                 var god = new God();
 
+                var inputResolver = god.Container.Resolve<InputResolver>();
+
                 god.Container.Resolve<ScriptLoader>();
 
                 var game = god.Container.Resolve<Game.Game>();
@@ -34,59 +34,15 @@ namespace RoadTrip
                 while (game.Run) {
                     if (Terminal.HasInput()) {
                         var key = Terminal.Read();
-                        EcsEntity? t = null;
-                        if (game.Player.Get<CameraFocusTag>() != null) {
-                            t = game.Player;
-                        }
-                        else if (game.Cursor.Get<CameraFocusTag>() != null) {
-                            t = game.Cursor;
-                        }
 
-                        switch (key) {
-                            case Terminal.TK_LEFT:
-                                if (t != null) {
-                                    var wtm = t.Value.Set<WantsToMove>();
-                                    wtm.Movement = new Coordinate(-1, 0, 0);
-                                }
-
-                                break;
-                            case Terminal.TK_RIGHT:
-                                if (t != null) {
-                                    var wtm = t.Value.Set<WantsToMove>();
-                                    wtm.Movement = new Coordinate(1, 0, 0);
-                                }
-
-                                break;
-                            case Terminal.TK_UP:
-                                if (t != null) {
-                                    var wtm = t.Value.Set<WantsToMove>();
-                                    wtm.Movement = new Coordinate(0, -1, 0);
-                                }
-
-                                break;
-                            case Terminal.TK_DOWN:
-                                if (t != null) {
-                                    var wtm = t.Value.Set<WantsToMove>();
-                                    wtm.Movement = new Coordinate(0, 1, 0);
-                                }
-
-                                break;
-                            case Terminal.TK_ENTER:
-                                if (game.Player.Get<CameraFocusTag>() != null) {
-                                    game.Player.Unset<CameraFocusTag>();
-                                    game.Cursor.Set<CameraFocusTag>();
-                                }
-                                else {
-                                    game.Player.Set<CameraFocusTag>();
-                                    game.Cursor.Unset<CameraFocusTag>();
-                                }
-
-                                break;
-                            case Terminal.TK_CLOSE:
-                                game.Run = false;
-                                break;
+                        switch (key)
+                        {
                             case Terminal.TK_RESIZED:
                                 rootView.Resize();
+                                break;
+                            default:
+                                var command = inputResolver.Resolve(rootView.CurrentInputContext, key);
+                                command.Act(game, rootView);
                                 break;
                         }
                     }
@@ -96,7 +52,6 @@ namespace RoadTrip
                 }
 
                 Terminal.Close();
-
                 Log.Information("Exiting");
             }
             catch (Exception e) {

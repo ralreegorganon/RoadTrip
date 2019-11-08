@@ -1,4 +1,6 @@
-﻿using System.Drawing;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
 using BearLib;
 
 namespace RoadTrip.UI
@@ -17,7 +19,17 @@ namespace RoadTrip.UI
             Terminal.Set("output: vsync=false;");
 
             Resize();
+
+            PushInputContext(InputContext.PlayerDirectControl);
         }
+
+        private Stack<InputContext> Context { get; } = new Stack<InputContext>();
+
+        public InputContext CurrentInputContext => Context.Peek();
+
+        public void PushInputContext(InputContext context) => Context.Push(context);
+
+        public void PopInputContext() => Context.Pop();
 
         public MapView MapView { get; }
 

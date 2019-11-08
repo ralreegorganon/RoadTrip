@@ -61,7 +61,10 @@ namespace RoadTrip.UI
 
         public void Print(int x, int y, ContentAlignment alignment, string text, params object[] args)
         {
-            Terminal.Print(x, y, alignment, text, args);
+            if (x >= 0 && x <= ScreenFrameAbs.Width && y >= 0 && y <= ScreenFrameAbs.Height)
+            {
+                Terminal.Print(ScreenFrameAbs.X + x, ScreenFrameAbs.Y + y, alignment, text, args);
+            }
         }
     }
 }

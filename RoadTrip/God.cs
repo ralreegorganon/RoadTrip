@@ -23,6 +23,8 @@ namespace RoadTrip
             Container.Register<Game.Game>(Reuse.Singleton);
             Container.Register<MapGenerator>(Reuse.Singleton);
 
+            Container.Register<InputResolver>(Reuse.Singleton);
+
             Container.Register<RootView>(Reuse.Singleton);
             Container.Register<MapView>(Reuse.Singleton);
             Container.Register<SidebarView>(Reuse.Singleton);
