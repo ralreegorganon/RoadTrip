@@ -123,7 +123,7 @@ namespace RoadTrip.UI
                     Terminal.Composition(false);
                 }
                 else {
-                    var xpath = XiaolinWu.Line(from.Coordinate, to.Coordinate).Where(x => {
+                    var xpath = Wu2.Line(from.Coordinate, to.Coordinate).Where(x => {
                         if (x.C == from.Coordinate) {
                             return false;
                         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace RoadTrip.Game.Mapgen
 {
@@ -13,6 +14,11 @@ namespace RoadTrip.Game.Mapgen
 
         public Map Generate()
         {
+            return Drunk();
+        }
+
+        private Map Classic()
+        {
             var r = new Random();
 
             var map = new Map();
@@ -21,19 +27,85 @@ namespace RoadTrip.Game.Mapgen
             var floor = Codex.TerrainLookup["t_floor"];
 
             var z = 0;
-            for (var x = 0; x < 256; x++) {
-                for (var y = 0; y < 256; y++) {
-                    if (x == 0 || x == 255 || y == 0 || y == 255) {
+            for (var x = 0; x < 256; x++)
+            {
+                for (var y = 0; y < 256; y++)
+                {
+                    if (x == 0 || x == 255 || y == 0 || y == 255)
+                    {
                         map.Terrain[new Coordinate(x, y, z)] = wall;
                     }
-                    else {
+                    else
+                    {
                         map.Terrain[new Coordinate(x, y, z)] = floor;
                     }
                 }
             }
 
-            for (var i = 0; i < 10000; i++) {
+            for (var i = 0; i < 10000; i++)
+            {
                 map.Terrain[new Coordinate(r.Next(1, 255), r.Next(1, 255), z)] = wall;
+            }
+
+            return map;
+        }
+
+        private Map Drunk()
+        {
+            var r = new Random();
+
+            var map = new Map();
+
+            var wall = Codex.TerrainLookup["t_wall"];
+            var floor = Codex.TerrainLookup["t_floor"];
+
+            for (var i = 0; i < 10; i++) {
+                var loc = new Coordinate(0, 0, 0);
+
+                map.Terrain[loc] = floor;
+
+                var c = 0;
+                while (c < 256)
+                {
+                    var n = r.Next(0, 3);
+                    switch (n)
+                    {
+                        case 0:
+                            loc += new Coordinate(1, 0, 0);
+                            break;
+                        case 1:
+                            loc += new Coordinate(-1, 0, 0);
+                            break;
+                        case 2:
+                            loc += new Coordinate(0, 1, 0);
+                            break;
+                        case 3:
+                            loc += new Coordinate(0, -1, 0);
+                            break;
+                    }
+
+                    if (map.Terrain.ContainsKey(loc))
+                    {
+                        continue;
+                    }
+
+                    map.Terrain[loc] = floor;
+                    c++;
+                }
+            }
+
+            var maxX = map.Terrain.Keys.Max(x => x.X);
+            var maxY = map.Terrain.Keys.Max(x => x.Y);
+            var minX = map.Terrain.Keys.Min(x => x.X);
+            var minY = map.Terrain.Keys.Min(x => x.Y);
+
+            for (var x = minX; x <= maxX; x++) {
+                for (var y = minY; y <= maxY; y++) {
+                    var c = new Coordinate(x, y, 0);
+                    if (!map.Terrain.ContainsKey(c)) {
+                        map.Terrain[c] = wall;
+                    }
+                }
             }
 
             return map;
