@@ -27,6 +27,7 @@ namespace RoadTrip.Game.Commands
         CancelTargeting,
         CommitTargeting,
         TogglePlayerCursorCameraFocus,
+        RevealMap,
         None
     }
 
@@ -126,6 +127,25 @@ namespace RoadTrip.Game.Commands
             Game.Run = false;
 
             return (true, null);
+        }
+    }
+
+    public class RevealMap : GameCommand
+    {
+        public RevealMap(Game game, EcsWorld world) : base(game, world)
+        {
+            Command = Command.RevealMap;
+        }
+
+        public override (bool PopCurrentState, RunState? PushState) Act()
+        {
+            var mapMemory = Game.Player.Get<MapMemory>();
+
+            foreach (var p in Game.Map.Terrain.Keys) {
+                mapMemory.Remembered.Add(p);
+            }
+
+            return (false, null);
         }
     }
 

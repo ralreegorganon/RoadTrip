@@ -98,70 +98,48 @@ namespace RoadTrip.UI
                 var from = Game.Player.Get<Position>();
                 var to = Game.Cursor.Get<Position>();
 
-                if (false) {
-                    var bpath = Bresenham.Line(from.Coordinate, to.Coordinate)
-                        .Skip(1);
-                    Terminal.Composition(true);
-                    foreach (var c in bpath)
-                    {
-                        var screenPos = WorldToScreen(c, worldFrameAbs, cameraFocusPosition.Coordinate);
-                        if (screenPos != null)
+                var points = true
+                    ? Wu2.Line(from.Coordinate, to.Coordinate) : Bresenham.Line(from.Coordinate, to.Coordinate)
+                        .Select(x => (C: x, A: 1.0));
+
+                var xpath = points.Where(x => {
+                    if (x.C == from.Coordinate) {
+                        return false;
+                    }
+
+                    if (x.C == to.Coordinate) {
+                        return true;
+                    }
+
+                    var hasChance = x.A > 0;
+                    if (!hasChance) {
+                        return false;
+                    }
+
+                    return viewshed.Visible.Contains(x.C);
+                }).ToList();
+
+                var color = viewshed.Visible.Contains(to.Coordinate) ? Color.LawnGreen : Color.Red;
+
+                Terminal.Composition(true);
+                foreach (var c in xpath)
+                {
+                    var screenPos = WorldToScreen(c.C, worldFrameAbs, cameraFocusPosition.Coordinate);
+                    if (screenPos != null) {
+                        Terminal.Color(Color.FromArgb((int)(180 * c.A), color.R, color.G, color.B));
+                        Put(screenPos.Value.X, screenPos.Value.Y, '█');
+
+                        if (c.C == to.Coordinate)
                         {
-                            Terminal.Color(Color.FromArgb(128, 255, 0, 0));
-                            Put(screenPos.Value.X, screenPos.Value.Y, '█');
-
-                            if (c == to.Coordinate)
-                            {
-                                Terminal.Color(Color.Red);
-                                Put(screenPos.Value.X, screenPos.Value.Y, '▔');
-                                Put(screenPos.Value.X, screenPos.Value.Y, '▁');
-                                Put(screenPos.Value.X, screenPos.Value.Y, '▏');
-                                Put(screenPos.Value.X, screenPos.Value.Y, '▕');
-                            }
+                            Terminal.Color(color);
+                            Put(screenPos.Value.X, screenPos.Value.Y, '▔');
+                            Put(screenPos.Value.X, screenPos.Value.Y, '▁');
+                            Put(screenPos.Value.X, screenPos.Value.Y, '▏');
+                            Put(screenPos.Value.X, screenPos.Value.Y, '▕');
                         }
                     }
-                    Terminal.Composition(false);
                 }
-                else {
-                    var xpath = Wu2.Line(from.Coordinate, to.Coordinate).Where(x => {
-                        if (x.C == from.Coordinate) {
-                            return false;
-                        }
-
-                        if (x.C == to.Coordinate) {
-                            return true;
-                        }
-
-                        var hasChance = x.A > 0;
-                        if (!hasChance) {
-                            return false;
-                        }
-
-                        return viewshed.Visible.Contains(x.C);
-                    }).ToList();
-
-                    var color = viewshed.Visible.Contains(to.Coordinate) ? Color.LawnGreen : Color.Red;
-
-                    Terminal.Composition(true);
-                    foreach (var c in xpath)
-                    {
-                        var screenPos = WorldToScreen(c.C, worldFrameAbs, cameraFocusPosition.Coordinate);
-                        if (screenPos != null) {
-                            Terminal.Color(Color.FromArgb((int)(180 * c.A), color.R, color.G, color.B));
-                            Put(screenPos.Value.X, screenPos.Value.Y, '█');
-
-                            if (c.C == to.Coordinate)
-                            {
-                                Terminal.Color(color);
-                                Put(screenPos.Value.X, screenPos.Value.Y, '▔');
-                                Put(screenPos.Value.X, screenPos.Value.Y, '▁');
-                                Put(screenPos.Value.X, screenPos.Value.Y, '▏');
-                                Put(screenPos.Value.X, screenPos.Value.Y, '▕');
-                            }
-                        }
-                    }
-                    Terminal.Composition(false);
-                }
+                Terminal.Composition(false);
             }
         }
 

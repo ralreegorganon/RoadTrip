@@ -16,6 +16,8 @@ namespace RoadTrip.UI
         public InputResolver(GameCommand[] commands)
         {
             KeyMapping = new Dictionary<(RunState, int), Command?> {
+                {(RunState.AwaitingInput, Terminal.TK_F2), Command.RevealMap},
+
                 {(RunState.AwaitingInput, Terminal.TK_UP), Command.MovePlayerNorth},
                 {(RunState.AwaitingInput, Terminal.TK_DOWN), Command.MovePlayerSouth},
                 {(RunState.AwaitingInput, Terminal.TK_LEFT), Command.MovePlayerWest},
@@ -42,7 +44,6 @@ namespace RoadTrip.UI
                 {(RunState.ShowTargeting, Terminal.TK_KP_9), Command.MoveCursorNorthEast},
                 {(RunState.ShowTargeting, Terminal.TK_KP_1), Command.MoveCursorSouthWest},
                 {(RunState.ShowTargeting, Terminal.TK_KP_3), Command.MoveCursorSouthEast},
-                {(RunState.ShowTargeting, Terminal.TK_CLOSE), Command.Quit},
                 {(RunState.ShowTargeting, Terminal.TK_ENTER), Command.CommitTargeting},
                 {(RunState.ShowTargeting, Terminal.TK_F), Command.CommitTargeting},
                 {(RunState.ShowTargeting, Terminal.TK_ESCAPE), Command.CancelTargeting},
