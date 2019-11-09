@@ -22,6 +22,11 @@ namespace RoadTrip.Game
             z = Z;
         }
 
+        public override string ToString()
+        {
+            return $"X:{X}, Y:{Y}, Z:{Z}";
+        }
+
         public override bool Equals(object? o)
         {
             return o is Coordinate other && Equals(other);
@@ -52,9 +57,20 @@ namespace RoadTrip.Game
             return new Coordinate(left.X + right.X, left.Y + right.Y, left.Z + right.Z);
         }
 
-        public override string ToString()
+        public static Coordinate operator -(Coordinate left, Coordinate right)
         {
-            return $"X:{X}, Y:{Y}, Z:{Z}";
+            return new Coordinate(left.X - right.X, left.Y - right.Y, left.Z - right.Z);
+        }
+
+        public Coordinate Abs()
+        {
+            return new Coordinate(Math.Abs(X), Math.Abs(Y), Math.Abs(Z));
+        }
+
+        public static int ChebyshevDistance(Coordinate left, Coordinate right)
+        {
+            var diff = (left - right).Abs();
+            return Math.Max(diff.X, Math.Max(diff.Y, diff.Z));
         }
     }
 }

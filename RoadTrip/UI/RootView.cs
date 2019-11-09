@@ -14,12 +14,13 @@ namespace RoadTrip.UI
 
     public class RootView : View
     {
-        public RootView(Game.Game game, InputResolver inputResolver, MapView mapView, SidebarView sidebarView)
+        public RootView(Game.Game game, InputResolver inputResolver, MapView mapView, SidebarView sidebarView, TargetingView targetingView)
         {
             Game = game;
             InputResolver = inputResolver;
             MapView = mapView;
             SidebarView = sidebarView;
+            TargetingView = targetingView;
 
             Terminal.Open();
             Terminal.Set("window: title='road trip', resizeable=true, size=80x24;");
@@ -41,6 +42,8 @@ namespace RoadTrip.UI
         public MapView MapView { get; }
 
         public SidebarView SidebarView { get; }
+
+        public TargetingView TargetingView { get; }
 
         private Stack<RunState> RunStateStack { get; } = new Stack<RunState>();
 
@@ -68,7 +71,7 @@ namespace RoadTrip.UI
                 case RunState.ShowTargeting:
                     Game.DisableGameplaySystems();
                     MapView.Draw(currentRunState);
-                    SidebarView.Draw(currentRunState);
+                    TargetingView.Draw(currentRunState);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -84,13 +87,17 @@ namespace RoadTrip.UI
                         break;
                     default:
                         var command = InputResolver.Resolve(RunStateStack.Peek(), key);
-                        var (popCurrentState, pushState) = command.Act(Game);
-                        if (popCurrentState) {
-                            RunStateStack.Pop();
-                        }
+                        if (command != null) {
+                            var (popCurrentState, pushState) = command.Act();
+                            if (popCurrentState)
+                            {
+                                RunStateStack.Pop();
+                            }
 
-                        if (pushState != null) {
-                            RunStateStack.Push(pushState.Value);
+                            if (pushState != null)
+                            {
+                                RunStateStack.Push(pushState.Value);
+                            }
                         }
                         break;
                 }
@@ -110,6 +117,7 @@ namespace RoadTrip.UI
             ScreenFrameAbs = new Rectangle(0, 0, width, height);
             MapView.ScreenFrameAbs = new Rectangle(ScreenFrameAbs.Left + 1, ScreenFrameAbs.Top + 1, ScreenFrameAbs.Right - 20, ScreenFrameAbs.Bottom - 2);
             SidebarView.ScreenFrameAbs = new Rectangle(MapView.ScreenFrameAbs.Right + 2, ScreenFrameAbs.Top + 1, ScreenFrameAbs.Width - MapView.ScreenFrameAbs.Width - 4, ScreenFrameAbs.Bottom - 2);
+            TargetingView.ScreenFrameAbs = new Rectangle(MapView.ScreenFrameAbs.Right + 2, ScreenFrameAbs.Top + 1, ScreenFrameAbs.Width - MapView.ScreenFrameAbs.Width - 4, ScreenFrameAbs.Bottom - 2);
         }
     }
 }

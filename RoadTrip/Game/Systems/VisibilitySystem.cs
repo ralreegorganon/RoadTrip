@@ -10,7 +10,7 @@ namespace RoadTrip.Game.Systems
             Game = game;
         }
 
-        public Game Game { get; set; }
+        private Game Game { get; }
 
         private EcsFilter<Position, Viewshed>? Filter { get; set; }
 

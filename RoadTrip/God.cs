@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using DryIoc;
 using Leopotam.Ecs;
 using RoadTrip.Game;
+using RoadTrip.Game.Commands;
 using RoadTrip.Game.Mapgen;
 using RoadTrip.Game.Systems;
 using RoadTrip.UI;
@@ -25,23 +27,24 @@ namespace RoadTrip
 
             Container.Register<InputResolver>(Reuse.Singleton);
 
+            Container.RegisterMany(typeof(GameCommand).Assembly.GetTypes().Where(type => type.IsSubclassOf(typeof(GameCommand))), Reuse.Singleton);
+
             Container.Register<RootView>(Reuse.Singleton);
             Container.Register<MapView>(Reuse.Singleton);
             Container.Register<SidebarView>(Reuse.Singleton);
+            Container.Register<TargetingView>(Reuse.Singleton);
 
             Container.Register<EcsWorld>(Reuse.Singleton);
             Container.Register<EcsSystems>(Reuse.Singleton);
 
             Container.Register<DummyFilterSystem>(Reuse.Singleton);
             Container.Register<MoveSystem>(Reuse.Singleton);
-            Container.Register<CursorSystem>(Reuse.Singleton);
             Container.Register<VisibilitySystem>(Reuse.Singleton);
 
             var systems = Container.Resolve<EcsSystems>();
             systems.Add(Container.Resolve<DummyFilterSystem>());
             systems.Add(Container.Resolve<VisibilitySystem>(), nameof(VisibilitySystem));
             systems.Add(Container.Resolve<MoveSystem>(), nameof(MoveSystem));
-            systems.Add(Container.Resolve<CursorSystem>(), nameof(CursorSystem));
 
             systems.Init();
         }

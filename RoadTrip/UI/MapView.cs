@@ -124,6 +124,10 @@ namespace RoadTrip.UI
                 }
                 else {
                     var xpath = XiaolinWu.Line(from.Coordinate, to.Coordinate).Where(x => {
+                        if (x.C == from.Coordinate) {
+                            return false;
+                        }
+
                         if (x.C == to.Coordinate) {
                             return true;
                         }
@@ -134,7 +138,7 @@ namespace RoadTrip.UI
                         }
 
                         return viewshed.Visible.Contains(x.C);
-                    }).Skip(1).ToList();
+                    }).ToList();
 
                     var color = viewshed.Visible.Contains(to.Coordinate) ? Color.LawnGreen : Color.Red;
 
