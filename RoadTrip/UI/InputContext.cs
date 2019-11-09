@@ -44,6 +44,7 @@ namespace RoadTrip.UI
                 {(RunState.ShowTargeting, Terminal.TK_KP_3), Command.MoveCursorSouthEast},
                 {(RunState.ShowTargeting, Terminal.TK_CLOSE), Command.Quit},
                 {(RunState.ShowTargeting, Terminal.TK_ENTER), Command.CommitTargeting},
+                {(RunState.ShowTargeting, Terminal.TK_F), Command.CommitTargeting},
                 {(RunState.ShowTargeting, Terminal.TK_ESCAPE), Command.CancelTargeting},
             };
 

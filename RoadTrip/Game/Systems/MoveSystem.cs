@@ -23,13 +23,14 @@ namespace RoadTrip.Game.Systems
 
                 var desired = position.Coordinate + move.Movement;
 
-                if (Game.Map.Terrain.TryGetValue(desired, out var terrain)) {
+                if (entity.Get<CursorTag>() != null) {
+                    position.Coordinate = desired;
+                } else if (Game.Map.Terrain.TryGetValue(desired, out var terrain)) {
                     if (!terrain.IsOpaque || entity.Get<IncorporealTag>() != null) {
                         position.Coordinate = desired;
 
                         var viewshed = entity.Get<Viewshed>();
-                        if (viewshed != null)
-                        {
+                        if (viewshed != null) {
                             viewshed.Dirty = true;
                         }
                     }
