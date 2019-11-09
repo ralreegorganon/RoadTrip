@@ -66,7 +66,6 @@ namespace RoadTrip.UI
                     MapView.Draw(currentRunState);
                     SidebarView.Draw(currentRunState);
                     RunStateStack.Pop();
-                    RunStateStack.Push(RunState.AwaitingInput);
                     break;
                 case RunState.ShowTargeting:
                     Game.DisableGameplaySystems();
