@@ -40,7 +40,6 @@ namespace RoadTrip.UI
             var textFontSpacingX = textFontSizeX / cellSizeX;
             var textFontSpacingY = textFontSizeY / cellSizeY;
 
-
             Terminal.Open();
             Terminal.Set($"window: title='road trip', resizeable=true, size={cellWidth}x{cellHeight}, cellsize={cellSizeX}x{cellSizeY};");
             Terminal.Set($"font: ./Cascadia.ttf, size={textFontSizeX}x{textFontSizeY}, spacing={textFontSpacingX}x{textFontSpacingY}");
