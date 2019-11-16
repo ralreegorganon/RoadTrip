@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using BearLib;
 using Leopotam.Ecs;
 using RoadTrip.Game;
 using RoadTrip.Game.Components;
@@ -11,19 +12,6 @@ namespace RoadTrip.UI
         {
             Game = game;
             World = world;
-
-            BorderStyle = new BorderStyle {
-                NW = '╒',
-                SW = '╘',
-                NE = '╕',
-                SE = '╛',
-                N = '╌',
-                S = '╌',
-                W = '╎',
-                E = '╎'
-            };
-
-            Title = "Target";
         }
 
         private EcsWorld World { get; }
@@ -32,6 +20,8 @@ namespace RoadTrip.UI
 
         public override void Draw(RunState currentRunState)
         {
+            Terminal.Color(Color.White);
+
             if (currentRunState != RunState.ShowTargeting) {
                 return;
             }
@@ -58,7 +48,7 @@ namespace RoadTrip.UI
 
             var distance = Coordinate.ChebyshevDistance(p, c);
 
-            Print(0, 1, ContentAlignment.TopLeft, $"[font=text][[{distance}]] {terrain.Name}[/font]]");
+            Print(0, 1, ContentAlignment.TopLeft, $"[[{distance}]] {terrain.Name}");
         }
     }
 }

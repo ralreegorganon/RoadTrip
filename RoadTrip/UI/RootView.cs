@@ -22,11 +22,40 @@ namespace RoadTrip.UI
             SidebarView = sidebarView;
             TargetingView = targetingView;
 
+            var cellSizeX = 4;
+            var cellSizeY = 4;
+
+            var cellWidth = 128 * cellSizeX;
+            var cellHeight = 64 * cellSizeY;
+
+            var mapFontId = "map";
+            var mapFontSizeX = 24;
+            var mapFontSizeY = 24;
+            var mapFontSpacingX = mapFontSizeX / cellSizeX;
+            var mapFontSpacingY = mapFontSizeY / cellSizeY;
+
+            var textFontId = "";
+            var textFontSizeX = 12;
+            var textFontSizeY = 24;
+            var textFontSpacingX = textFontSizeX / cellSizeX;
+            var textFontSpacingY = textFontSizeY / cellSizeY;
+
+
             Terminal.Open();
-            Terminal.Set("window: title='road trip', resizeable=true, size=80x24;");
-            Terminal.Set("text font: ./Cascadia.ttf, size=16x16");
-            Terminal.Set("font: ./Topaz-8.ttf, size=16x16");
+            Terminal.Set($"window: title='road trip', resizeable=true, size={cellWidth}x{cellHeight}, cellsize={cellSizeX}x{cellSizeY};");
+            Terminal.Set($"font: ./Cascadia.ttf, size={textFontSizeX}x{textFontSizeY}, spacing={textFontSpacingX}x{textFontSpacingY}");
+            Terminal.Set($"{mapFontId} font: ./Cascadia.ttf, size={mapFontSizeX}x{mapFontSizeY}, spacing={mapFontSpacingX}x{mapFontSpacingY}");
+            //Terminal.Set("font: ./Topaz-8.ttf, size=16x16");
+            //Terminal.Set("font: ./square.ttf, size=16x16");
+            //Terminal.Set("font: ./whitrabt.ttf, size=16");
             Terminal.Set("output: vsync=false;");
+
+            MapView.Font = mapFontId;
+            MapView.SpacingX = mapFontSpacingX;
+            MapView.SpacingY = mapFontSpacingY;
+
+            SidebarView.SpacingX = textFontSpacingX;
+            SidebarView.SpacingY = textFontSpacingY;
 
             Resize();
 
@@ -114,9 +143,9 @@ namespace RoadTrip.UI
             var cheight = Terminal.State(Terminal.TK_CELL_HEIGHT);
 
             ScreenFrameAbs = new Rectangle(0, 0, width, height);
-            MapView.ScreenFrameAbs = new Rectangle(ScreenFrameAbs.Left + 1, ScreenFrameAbs.Top + 1, ScreenFrameAbs.Right - 20, ScreenFrameAbs.Bottom - 2);
-            SidebarView.ScreenFrameAbs = new Rectangle(MapView.ScreenFrameAbs.Right + 2, ScreenFrameAbs.Top + 1, ScreenFrameAbs.Width - MapView.ScreenFrameAbs.Width - 4, ScreenFrameAbs.Bottom - 2);
-            TargetingView.ScreenFrameAbs = new Rectangle(MapView.ScreenFrameAbs.Right + 2, ScreenFrameAbs.Top + 1, ScreenFrameAbs.Width - MapView.ScreenFrameAbs.Width - 4, ScreenFrameAbs.Bottom - 2);
+            MapView.ScreenFrameAbs = new Rectangle(ScreenFrameAbs.Left, ScreenFrameAbs.Top, ScreenFrameAbs.Right - 30 * SidebarView.SpacingX, ScreenFrameAbs.Bottom);
+            SidebarView.ScreenFrameAbs = new Rectangle(MapView.ScreenFrameAbs.Right, ScreenFrameAbs.Top, ScreenFrameAbs.Width - MapView.ScreenFrameAbs.Width, ScreenFrameAbs.Bottom);
+            TargetingView.ScreenFrameAbs = new Rectangle(MapView.ScreenFrameAbs.Right, ScreenFrameAbs.Top, ScreenFrameAbs.Width - MapView.ScreenFrameAbs.Width, ScreenFrameAbs.Bottom);
         }
     }
 }

@@ -27,11 +27,11 @@ namespace RoadTrip.Game.Mapgen
             var floor = Codex.TerrainLookup["t_floor"];
 
             var z = 0;
-            for (var x = 0; x < 256; x++)
+            for (var x = -1; x < 255; x++)
             {
-                for (var y = 0; y < 256; y++)
+                for (var y = -1; y < 255; y++)
                 {
-                    if (x == 0 || x == 255 || y == 0 || y == 255)
+                    if (x == -1 || x == 254 || y == -1 || y == 254)
                     {
                         map.Terrain[new Coordinate(x, y, z)] = wall;
                     }
@@ -44,7 +44,7 @@ namespace RoadTrip.Game.Mapgen
 
             for (var i = 0; i < 10000; i++)
             {
-                map.Terrain[new Coordinate(r.Next(1, 255), r.Next(1, 255), z)] = wall;
+                map.Terrain[new Coordinate(r.Next(-1, 254), r.Next(-1, 254), z)] = wall;
             }
 
             return map;

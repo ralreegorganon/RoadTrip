@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using BearLib;
@@ -14,28 +15,30 @@ namespace RoadTrip.UI
         {
             Game = game;
             World = world;
-
-            BorderStyle = new BorderStyle {
-                NW = '╔',
-                SW = '╚',
-                NE = '╗',
-                SE = '╝',
-                N = '═',
-                S = '═',
-                W = '║',
-                E = '║'
-            };
-
-            Title = "Map";
         }
 
         private EcsWorld World { get; }
 
         private Game.Game Game { get; }
 
+
+        public static IEnumerable<(Coordinate World, Coordinate Screen)> Each(Rectangle worldFrame, Rectangle screenFrame, Coordinate cameraFocus, int xRatio, int yRatio)
+        {
+            for (var wx = worldFrame.X; wx < worldFrame.Right; wx++) {
+                for (var wy = worldFrame.Y; wy < worldFrame.Bottom; wy++) {
+                    var wc = new Coordinate(wx, wy, cameraFocus.Z);
+                    var sc = WorldToScreen(wc, worldFrame, screenFrame, cameraFocus, xRatio, yRatio);
+                    yield return (wc, sc.Value);
+                }
+            }
+        }
+
         public override void Draw(RunState currentRunState)
         {
             base.Draw(currentRunState);
+
+            Terminal.Font(Font);
+
 
             var cameraFocusFilter = World.GetFilter(typeof(EcsFilter<Position, CameraFocusTag>));
 
@@ -49,63 +52,58 @@ namespace RoadTrip.UI
             var viewshed = Game.Player.Get<Viewshed>();
             var mapMemory = Game.Player.Get<MapMemory>();
 
-            var worldFrameAbs = new Rectangle(cameraFocusPosition.Coordinate.X - ScreenFrameAbs.Width / 2, cameraFocusPosition.Coordinate.Y - ScreenFrameAbs.Height / 2, ScreenFrameAbs.Width, ScreenFrameAbs.Height);
+            // The coordinate range, in world coordinates, that are visible in the screen.
+            var worldFrameAbs = new Rectangle(cameraFocusPosition.Coordinate.X - ScreenFrameAbs.Width / SpacingX / 2, cameraFocusPosition.Coordinate.Y - ScreenFrameAbs.Height / SpacingY / 2, ScreenFrameAbs.Width / SpacingX, ScreenFrameAbs.Height / SpacingY);
 
-            for (var sx = 0; sx < ScreenFrameAbs.Width; sx++)
-            for (var sy = 0; sy < ScreenFrameAbs.Height; sy++) {
-                var wp = Point.Add(worldFrameAbs.Location, new Size(sx, sy));
-                var c = new Coordinate(wp.X, wp.Y, cameraFocusPosition.Coordinate.Z);
-
+            foreach (var c in Each(worldFrameAbs, ScreenFrameAbs, cameraFocusPosition.Coordinate, SpacingX, SpacingY)) {
                 // We never forget and anything visible is in memory...
-                var remembered = mapMemory.Remembered.Contains(c);
-                if (!remembered) {
+                var remembered = mapMemory.Remembered.Contains(c.World);
+                if (!remembered)
+                {
                     continue;
                 }
 
                 // If there's nothing to draw here... don't.
-                if (!Game.Map.Terrain.TryGetValue(c, out var terrain)) {
+                if (!Game.Map.Terrain.TryGetValue(c.World, out var terrain))
+                {
                     continue;
                 }
 
 
-                var visible = viewshed.Visible.Contains(c);
-                if (visible) {
+                var visible = viewshed.Visible.Contains(c.World);
+                if (visible)
+                {
                     Terminal.Color(terrain.Renderable.FgColor);
                     Terminal.BkColor(terrain.Renderable.BgColor);
                 }
-                else {
-                    {
-                        var luminosity = ((0.21 * terrain.Renderable.FgColor.R) + (0.72 * terrain.Renderable.FgColor.G) + (0.07 * terrain.Renderable.FgColor.B)) / 3;
-                        var gray = Convert.ToInt32(luminosity);
-                        var newColor = Color.FromArgb(255, gray, gray, gray);
-                        Terminal.Color(newColor);
-                    }
-                    {
-                        var luminosity = ((0.21 * terrain.Renderable.BgColor.R) + (0.72 * terrain.Renderable.BgColor.G) + (0.07 * terrain.Renderable.BgColor.B)) / 3;
-                        var gray = Convert.ToInt32(luminosity);
-                        var newColor = Color.FromArgb(255, gray, gray, gray);
-                        Terminal.BkColor(newColor);
-                    }
+                else
+                {
+                    Terminal.Color(terrain.Renderable.FgColor.Greyscale());
+                    Terminal.BkColor(terrain.Renderable.BgColor.Greyscale());
                 }
-                Put(sx, sy, terrain.Renderable.Symbol);
+
+                Put(c.Screen.X, c.Screen.Y, terrain.Renderable.Symbol);
             }
 
             Terminal.BkColor(Color.Black);
 
             var renderable = World.GetFilter(typeof(EcsFilter<Position, Renderable>));
-            foreach (var i in renderable) {
+            foreach (var i in renderable)
+            {
                 ref var e = ref renderable.Entities[i];
                 var pos = e.Get<Position>();
                 var render = e.Get<Renderable>();
 
-                var screenPos = WorldToScreen(pos.Coordinate, worldFrameAbs, cameraFocusPosition.Coordinate);
-                if (screenPos != null) {
+                var screenPos = WorldToScreen(pos.Coordinate, worldFrameAbs, ScreenFrameAbs, cameraFocusPosition.Coordinate, SpacingX, SpacingY);
+                if (screenPos != null)
+                {
                     Terminal.Color(render.FgColor);
                     Put(screenPos.Value.X, screenPos.Value.Y, render.Symbol);
                 }
             }
 
-            if (CurrentRunState == RunState.ShowTargeting) {
+            if (CurrentRunState == RunState.ShowTargeting)
+            {
                 var from = Game.Player.Get<Position>();
                 var to = Game.Cursor.Get<Position>();
 
@@ -114,16 +112,19 @@ namespace RoadTrip.UI
                         .Select(x => (C: x, A: 1.0));
 
                 var xpath = points.Where(x => {
-                    if (x.C == from.Coordinate) {
+                    if (x.C == from.Coordinate)
+                    {
                         return false;
                     }
 
-                    if (x.C == to.Coordinate) {
+                    if (x.C == to.Coordinate)
+                    {
                         return true;
                     }
 
                     var hasChance = x.A > 0;
-                    if (!hasChance) {
+                    if (!hasChance)
+                    {
                         return false;
                     }
 
@@ -135,8 +136,9 @@ namespace RoadTrip.UI
                 Terminal.Composition(true);
                 foreach (var c in xpath)
                 {
-                    var screenPos = WorldToScreen(c.C, worldFrameAbs, cameraFocusPosition.Coordinate);
-                    if (screenPos != null) {
+                    var screenPos = WorldToScreen(c.C, worldFrameAbs, ScreenFrameAbs, cameraFocusPosition.Coordinate, SpacingX, SpacingY);
+                    if (screenPos != null)
+                    {
                         Terminal.Color(Color.FromArgb((int)(180 * c.A), color.R, color.G, color.B));
                         Put(screenPos.Value.X, screenPos.Value.Y, '█');
 
@@ -154,17 +156,28 @@ namespace RoadTrip.UI
             }
         }
 
-        public static Coordinate? WorldToScreen(Coordinate world, Rectangle worldFrameAbs, Coordinate cameraFocus)
+        public static Coordinate? WorldToScreen(Coordinate world, Rectangle worldFrameAbs, Rectangle screenFrameAbs, Coordinate cameraFocus, int xRatio, int yRatio)
         {
             if (world.Z != cameraFocus.Z) {
                 return null;
             }
 
-            if (!worldFrameAbs.Contains(world.X, world.Y)) {
+            var a = world.X < worldFrameAbs.X;
+            var b = world.Y < worldFrameAbs.Y;
+            var c = world.X > worldFrameAbs.X + worldFrameAbs.Width;
+            var d = world.Y > worldFrameAbs.Y + worldFrameAbs.Height;
+
+            if (a || b || c || d) {
                 return null;
             }
 
-            return new Coordinate(world.X - worldFrameAbs.Location.X, world.Y - worldFrameAbs.Location.Y, world.Z);
+
+            //screen 1, 0 = wf.x + 1, wf.y
+
+            var dx = (world.X - worldFrameAbs.Location.X);
+            var dy = (world.Y - worldFrameAbs.Location.Y);
+
+            return new Coordinate((screenFrameAbs.X + dx) * xRatio, (screenFrameAbs.Y + dy) * yRatio, world.Z);
         }
     }
 }

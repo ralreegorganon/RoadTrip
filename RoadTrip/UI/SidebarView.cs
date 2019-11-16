@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using BearLib;
 using Leopotam.Ecs;
 using RoadTrip.Game;
 using RoadTrip.Game.Components;
@@ -11,19 +12,6 @@ namespace RoadTrip.UI
         {
             Game = game;
             World = world;
-
-            BorderStyle = new BorderStyle {
-                NW = '╒',
-                SW = '╘',
-                NE = '╕',
-                SE = '╛',
-                N = '╌',
-                S = '╌',
-                W = '╎',
-                E = '╎'
-            };
-
-            Title = "Sidebar";
         }
 
         private EcsWorld World { get; }
@@ -33,6 +21,18 @@ namespace RoadTrip.UI
         public override void Draw(RunState currentRunState)
         {
             base.Draw(currentRunState);
+            Terminal.BkColor(Color.CornflowerBlue);
+            Terminal.Color(Color.White);
+            for (var x = 0; x < ScreenFrameAbs.Width; x+=SpacingX) {
+                Print(x, 0, ContentAlignment.TopLeft, "x");
+            }
+
+            Print(0, SpacingY, ContentAlignment.TopLeft, "0123456789ABCDEFGHIJKLMNO");
+
+
+            Terminal.Layer(1);
+            Terminal.BkColor(Color.Black);
+            Terminal.Color(Color.White);
 
             var cameraFocusFilter = World.GetFilter(typeof(EcsFilter<Position, CameraFocusTag>));
 
@@ -59,7 +59,7 @@ namespace RoadTrip.UI
                 return;
             }
 
-            Print(0, 1, ContentAlignment.TopLeft, $"[font=text]Location: {terrain.Name}[/font]");
+            Print(0, SpacingY*2, ContentAlignment.TopLeft, $"Location: {terrain.Name}");
         }
     }
 }

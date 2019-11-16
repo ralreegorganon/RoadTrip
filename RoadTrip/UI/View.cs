@@ -7,53 +7,21 @@ namespace RoadTrip.UI
     {
         public Rectangle ScreenFrameAbs { get; set; }
 
-        protected BorderStyle? BorderStyle { get; set; }
+        public string Font { get; set; } = string.Empty;
 
-        protected string? Title { get; set; }
+        public int SpacingX { get; set; }
+
+        public int SpacingY { get; set; }
 
         protected RunState CurrentRunState { get; set; }
 
         public virtual void Draw(RunState currentRunState)
         {
             CurrentRunState = currentRunState;
-
-            DrawBorders();
-            DrawTitle();
-        }
-
-        public void DrawBorders()
-        {
-            if (BorderStyle == null) {
-                return;
-            }
-
-            Terminal.Color(Color.NavajoWhite);
-
-            Terminal.Put(ScreenFrameAbs.X - 1, ScreenFrameAbs.Y - 1, BorderStyle.NW);
-            Terminal.Put(ScreenFrameAbs.X + ScreenFrameAbs.Width, ScreenFrameAbs.Y - 1, BorderStyle.NE);
-            Terminal.Put(ScreenFrameAbs.X - 1, ScreenFrameAbs.Y + ScreenFrameAbs.Height, BorderStyle.SW);
-            Terminal.Put(ScreenFrameAbs.X + ScreenFrameAbs.Width, ScreenFrameAbs.Y + ScreenFrameAbs.Height, BorderStyle.SE);
-
-            for (var dx = 0; dx < ScreenFrameAbs.Width; dx++) {
-                Terminal.Put(ScreenFrameAbs.X + dx, ScreenFrameAbs.Y - 1, BorderStyle.N);
-                Terminal.Put(ScreenFrameAbs.X + dx, ScreenFrameAbs.Y + ScreenFrameAbs.Height, BorderStyle.S);
-            }
-
-            for (var dy = 0; dy < ScreenFrameAbs.Height; dy++) {
-                Terminal.Put(ScreenFrameAbs.X - 1, ScreenFrameAbs.Y + dy, BorderStyle.W);
-                Terminal.Put(ScreenFrameAbs.X + ScreenFrameAbs.Width, ScreenFrameAbs.Y + dy, BorderStyle.E);
-            }
-        }
-
-        public virtual void DrawTitle()
-        {
-            if (Title == null) {
-                return;
-            }
-
-            Terminal.Color(Color.WhiteSmoke);
-
-            Terminal.Print(ScreenFrameAbs.X, ScreenFrameAbs.Y - 1, ContentAlignment.TopLeft, Title);
+            Terminal.Font("");
+            Terminal.Layer(0);
+            Terminal.BkColor(Color.Black);
+            Terminal.Color(Color.White);
         }
 
         public void Put(int x, int y, char code)
