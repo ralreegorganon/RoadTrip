@@ -6,5 +6,6 @@ namespace RoadTrip.Game.Components
     {
         public char Symbol { get; set; }
         public Color FgColor { get; set; }
+        public Color BgColor { get; set; }
     }
 }

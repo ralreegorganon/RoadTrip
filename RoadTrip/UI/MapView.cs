@@ -67,19 +67,30 @@ namespace RoadTrip.UI
                     continue;
                 }
 
+
                 var visible = viewshed.Visible.Contains(c);
                 if (visible) {
                     Terminal.Color(terrain.Renderable.FgColor);
+                    Terminal.BkColor(terrain.Renderable.BgColor);
                 }
                 else {
-                    var luminosity = ((0.21 * terrain.Renderable.FgColor.R) + (0.72 * terrain.Renderable.FgColor.G) + (0.07 * terrain.Renderable.FgColor.B)) / 3;
-                    var gray = Convert.ToInt32(luminosity);
-                    var newColor = Color.FromArgb(255, gray, gray, gray);
-                    Terminal.Color(newColor);
+                    {
+                        var luminosity = ((0.21 * terrain.Renderable.FgColor.R) + (0.72 * terrain.Renderable.FgColor.G) + (0.07 * terrain.Renderable.FgColor.B)) / 3;
+                        var gray = Convert.ToInt32(luminosity);
+                        var newColor = Color.FromArgb(255, gray, gray, gray);
+                        Terminal.Color(newColor);
+                    }
+                    {
+                        var luminosity = ((0.21 * terrain.Renderable.BgColor.R) + (0.72 * terrain.Renderable.BgColor.G) + (0.07 * terrain.Renderable.BgColor.B)) / 3;
+                        var gray = Convert.ToInt32(luminosity);
+                        var newColor = Color.FromArgb(255, gray, gray, gray);
+                        Terminal.BkColor(newColor);
+                    }
                 }
-
                 Put(sx, sy, terrain.Renderable.Symbol);
             }
+
+            Terminal.BkColor(Color.Black);
 
             var renderable = World.GetFilter(typeof(EcsFilter<Position, Renderable>));
             foreach (var i in renderable) {
