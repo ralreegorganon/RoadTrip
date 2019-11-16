@@ -52,7 +52,7 @@ namespace RoadTrip.Game.Mapgen
 
         private Map Drunk()
         {
-            var r = new Random();
+            var r = new Random(0);
 
             var map = new Map();
 

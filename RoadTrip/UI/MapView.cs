@@ -55,39 +55,117 @@ namespace RoadTrip.UI
             var from = Game.Player.Get<Position>();
             var to = Game.Cursor.Get<Position>();
 
-            var points = true
-                ? Wu2.Line(from.Coordinate, to.Coordinate)
-                : Bresenham.Line(from.Coordinate, to.Coordinate)
-                    .Select(x => (C: x, A: 1.0));
+            var points = Wu2Pair.Line(from.Coordinate, to.Coordinate);
 
-            var xpath = points.Where(x => {
-                    if (x.C == from.Coordinate) {
-                        return false;
+            var path = points.Aggregate(new HashSet<Coordinate>(), (list, tuple) => {
+                if (tuple.First.C == from.Coordinate) {
+                    return list;
+                }
+
+                if (tuple.First.C == to.Coordinate) {
+                    list.Add(tuple.First.C);
+                    return list;
+                }
+
+                var viewshedContainsFirst = viewshed.Visible.Contains(tuple.First.C);
+                var viewshedContainsSecond = viewshed.Visible.Contains(tuple.Second.C);
+
+                if (!viewshedContainsFirst && !viewshedContainsSecond) {
+                    return list;
+                }
+
+                if (!viewshedContainsFirst) {
+                    list.Add(tuple.Second.C);
+                    return list;
+                }
+
+                if (!viewshedContainsSecond)
+                {
+                    list.Add(tuple.First.C);
+                    return list;
+                }
+
+                var firstTerrainExists = Game.Map.Terrain.TryGetValue(tuple.First.C, out var firstTerrain);
+                var secondTerrainExists = Game.Map.Terrain.TryGetValue(tuple.Second.C, out var secondTerrain);
+
+                if (!firstTerrainExists && !secondTerrainExists) {
+                    return list;
+                }
+
+                if (!firstTerrainExists) {
+                    list.Add(tuple.Second.C);
+                    return list;
+                }
+
+                if (!secondTerrainExists) {
+                    list.Add(tuple.First.C);
+                    return list;
+                }
+
+                if (firstTerrain.IsOpaque && secondTerrain.IsOpaque) {
+                    return list;
+                }
+
+                if (firstTerrain.IsOpaque) {
+                    list.Add(tuple.Second.C);
+                    return list;
+                }
+
+                if (secondTerrain.IsOpaque)
+                {
+                    list.Add(tuple.First.C);
+                    return list;
+                }
+
+                var previous = list.LastOrDefault();
+                if (previous != default) {
+                    var firstDistance = Coordinate.ManhattanDistance(previous, tuple.First.C);
+                    var secondDistance = Coordinate.ManhattanDistance(previous, tuple.Second.C);
+
+                    if (firstDistance < secondDistance)
+                    {
+                        list.Add(tuple.First.C);
+                        return list;
                     }
 
-                    if (x.C == to.Coordinate) {
-                        return true;
+                    if (firstDistance > secondDistance)
+                    {
+                        list.Add(tuple.Second.C);
+                        return list;
                     }
+                }
 
-                    var hasChance = x.A > 0;
-                    if (!hasChance) {
-                        return false;
-                    }
+                list.Add(tuple.First.A > tuple.Second.A ? tuple.First.C : tuple.Second.C);
+                return list;
+            });
 
-                    return viewshed.Visible.Contains(x.C);
-                })
-                .ToList();
+            var path2 = points.Aggregate(new HashSet<(Coordinate C, double A)>(), (list, tuple) => {
+                if (tuple.First.C == from.Coordinate)
+                {
+                    return list;
+                }
+
+                list.Add(tuple.First);
+                list.Add(tuple.Second);
+
+                return list;
+            });
 
             var color = viewshed.Visible.Contains(to.Coordinate) ? Color.LawnGreen : Color.Red;
 
             Terminal.Composition(true);
-            foreach (var c in xpath) {
+            foreach (var c in path2) {
                 var screenPos = WorldToScreen(c.C, worldFrameAbs, ScreenFrameAbs, cameraFocusPosition.Coordinate, SpacingX, SpacingY);
                 if (screenPos == null) {
                     continue;
                 }
 
-                Terminal.Color(Color.FromArgb((int) (180 * c.A), color.R, color.G, color.B));
+                var alpha = 25;
+                if (path.Contains(c.C)) {
+                    alpha = 180;
+                }
+
+                Terminal.Color(Color.FromArgb(alpha, color.R, color.G, color.B));
                 Put(screenPos.Value.X, screenPos.Value.Y, '█');
 
                 if (c.C != to.Coordinate) {

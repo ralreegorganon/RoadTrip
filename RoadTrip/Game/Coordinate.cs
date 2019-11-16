@@ -72,5 +72,12 @@ namespace RoadTrip.Game
             var diff = (left - right).Abs();
             return Math.Max(diff.X, Math.Max(diff.Y, diff.Z));
         }
+
+        public static int ManhattanDistance(Coordinate left, Coordinate right)
+        {
+            var diff = (left - right).Abs();
+            return diff.X + diff.Y + diff.Z;
+
+        }
     }
 }
