@@ -9,7 +9,7 @@ namespace RoadTrip.Game
         {
         }
 
-        public TerrainType(string id, string name, char sym, Color fg, Color bg, bool isOpaque) : base()
+        public TerrainType(string id, string name, char sym, Color fg, Color bg, bool isOpaque, bool isPassable) : base()
         {
             Id = id;
             Name = name;
@@ -17,11 +17,13 @@ namespace RoadTrip.Game
             Renderable.FgColor = fg;
             Renderable.BgColor = bg;
             IsOpaque = isOpaque;
+            IsPassable = isPassable;
         }
 
         public string Id { get; set; } = "Unknown";
         public string Name { get; set; } = "Unknown";
         public Renderable Renderable { get; set; } = new Renderable {Symbol = '?', FgColor = Color.White, BgColor = Color.Black };
         public bool IsOpaque { get; set; }
+        public bool IsPassable { get; set; }
     }
 }

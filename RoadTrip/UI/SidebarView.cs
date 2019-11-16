@@ -1,7 +1,6 @@
 ﻿using System.Drawing;
 using BearLib;
 using Leopotam.Ecs;
-using RoadTrip.Game;
 using RoadTrip.Game.Components;
 
 namespace RoadTrip.UI

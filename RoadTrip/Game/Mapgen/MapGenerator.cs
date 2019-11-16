@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Linq;
+using Leopotam.Ecs;
 
 namespace RoadTrip.Game.Mapgen
 {
     public class MapGenerator
     {
-        public MapGenerator(Codex codex)
+        public MapGenerator(Codex codex, EcsWorld world)
         {
             Codex = codex;
+            World = world;
         }
 
         public Codex Codex { get; set; }
+
+        private EcsWorld World { get; }
 
         public Map Generate()
         {
@@ -107,6 +111,19 @@ namespace RoadTrip.Game.Mapgen
                     }
                 }
             }
+
+
+            var monCount = 0;
+            do {
+                var c = new Coordinate(r.Next(minX, maxX), r.Next(minX, maxX), 0);
+                if (map.Terrain.TryGetValue(c, out var t)) {
+                    if (t.IsPassable) {
+                        Codex.SpawnMobAtPosition(World, "mon_zed", c);
+                        monCount++;
+                    }
+                }
+
+            } while (monCount < 5);
 
             return map;
         }

@@ -30,7 +30,7 @@ namespace RoadTrip.Game
 
             var scriptGlobals = new ScriptGlobals(codex, game, world);
 
-            var opts = ScriptOptions.Default.AddImports("System", "System.Collections.Generic", "System.Drawing", "RoadTrip.Game", "RoadTrip.Game.Components");
+            var opts = ScriptOptions.Default.AddImports("System", "System.Collections.Generic", "System.Drawing", "RoadTrip.Game", "RoadTrip.Game.Components", "RoadTrip.Game.Blueprints");
 
             var assemblies = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(x => x.IsDynamic == false);
@@ -69,6 +69,7 @@ namespace RoadTrip.Game
             }
 
             codex.TerrainLookup = codex.TerrainTypes.ToDictionary(k => k.Id, v => v);
+            codex.MobsLookup = codex.Mobs.ToDictionary(k => k.Id, v => v);
         }
 
         private ILogger Logger { get; }

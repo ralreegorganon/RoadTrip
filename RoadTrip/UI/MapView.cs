@@ -43,7 +43,7 @@ namespace RoadTrip.UI
 
             RenderTerrain(worldFrameAbs, cameraFocusPosition, mapMemory, viewshed);
 
-            RenderOther(worldFrameAbs, cameraFocusPosition);
+            RenderOther(worldFrameAbs, cameraFocusPosition, viewshed);
 
             if (CurrentRunState == RunState.ShowTargeting) {
                 RenderTargeting(viewshed, worldFrameAbs, cameraFocusPosition);
@@ -165,10 +165,9 @@ namespace RoadTrip.UI
                     alpha = 180;
                 }
 
-                Terminal.Color(Color.FromArgb(alpha, color.R, color.G, color.B));
-                Put(screenPos.Value.X, screenPos.Value.Y, '█');
-
                 if (c.C != to.Coordinate) {
+                    Terminal.Color(Color.FromArgb(alpha, color.R, color.G, color.B));
+                    Put(screenPos.Value.X, screenPos.Value.Y, '█');
                     continue;
                 }
 
@@ -182,7 +181,7 @@ namespace RoadTrip.UI
             Terminal.Composition(false);
         }
 
-        private void RenderOther(Rectangle worldFrameAbs, Position cameraFocusPosition)
+        private void RenderOther(Rectangle worldFrameAbs, Position cameraFocusPosition, Viewshed viewshed)
         {
             Terminal.Layer(1);
 
@@ -191,6 +190,10 @@ namespace RoadTrip.UI
                 ref var e = ref renderable.Entities[i];
                 var pos = e.Get<Position>();
                 var render = e.Get<Renderable>();
+
+                if (!viewshed.Visible.Contains(pos.Coordinate)) {
+                    continue;
+                }
 
                 var screenPos = WorldToScreen(pos.Coordinate, worldFrameAbs, ScreenFrameAbs, cameraFocusPosition.Coordinate, SpacingX, SpacingY);
                 if (screenPos == null) {
