@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Linq;
 using BearLib;
 using Leopotam.Ecs;
 using RoadTrip.Game;
@@ -48,7 +49,20 @@ namespace RoadTrip.UI
 
             var distance = Coordinate.ChebyshevDistance(p, c);
 
-            Print(0, 1, ContentAlignment.TopLeft, $"[[{distance}]] {terrain.Name}");
+            Print(0, 0, ContentAlignment.TopLeft, $"[[{distance}]] {terrain.Name}");
+
+            if (Game.Map.TileEntities.TryGetValue(c, out var entities)) {
+                var names = entities.Select(x => x.Get<Nameable>()
+                        ?.Name)
+                    .Where(x => x != null)
+                    .ToList();
+
+                var y = SpacingY;
+                foreach (var name in names) {
+                    Print(0, y, ContentAlignment.TopLeft, name);
+                    y += SpacingY;
+                }
+            }
         }
     }
 }

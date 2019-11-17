@@ -40,9 +40,11 @@ namespace RoadTrip
             Container.Register<DummyFilterSystem>(Reuse.Singleton);
             Container.Register<MoveSystem>(Reuse.Singleton);
             Container.Register<VisibilitySystem>(Reuse.Singleton);
+            Container.Register<MapIndexingSystem>(Reuse.Singleton);
 
             var systems = Container.Resolve<EcsSystems>();
             systems.Add(Container.Resolve<DummyFilterSystem>());
+            systems.Add(Container.Resolve<MapIndexingSystem>(), nameof(MapIndexingSystem));
             systems.Add(Container.Resolve<VisibilitySystem>(), nameof(VisibilitySystem));
             systems.Add(Container.Resolve<MoveSystem>(), nameof(MoveSystem));
 

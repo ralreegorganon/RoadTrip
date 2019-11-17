@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 using RoadTrip.Game;
 
@@ -8,9 +9,9 @@ namespace RoadTripBenchmark
    public class LineBenchmarks
     {
         [Benchmark]
-        public List<(Coordinate, float)> First()
+        public List<Coordinate> First()
         {
-            return XiaolinWu.Line(new Coordinate(0, 0, 0), new Coordinate(10, 3, 0));
+            return Bresenham.Line(new Coordinate(0, 0, 0), new Coordinate(10, 3, 0)).ToList();
         }
 
         [Benchmark]
@@ -20,10 +21,9 @@ namespace RoadTripBenchmark
         }
 
         [Benchmark]
-        public List<(Coordinate, double)> Third()
+        public List<((Coordinate, double), (Coordinate, double))> Third()
         {
-            return Wu2.Line(new Coordinate(0, 0, 0), new Coordinate(10, 3, 0));
+            return Wu2Pair.Line(new Coordinate(0, 0, 0), new Coordinate(10, 3, 0));
         }
     }
-}
 }

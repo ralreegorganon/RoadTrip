@@ -56,6 +56,9 @@ namespace RoadTrip.UI
             SidebarView.SpacingX = textFontSpacingX;
             SidebarView.SpacingY = textFontSpacingY;
 
+            TargetingView.SpacingX = textFontSpacingX;
+            TargetingView.SpacingY = textFontSpacingY;
+
             Resize();
 
             Game.Setup();

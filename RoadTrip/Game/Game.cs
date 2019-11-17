@@ -44,6 +44,7 @@ namespace RoadTrip.Game
         }
 
         private List<string> GameplaySystems { get; } = new List<string> {
+            nameof(MapIndexingSystem),
             nameof(VisibilitySystem)
         };
 
